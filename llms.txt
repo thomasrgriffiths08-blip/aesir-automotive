@@ -37,6 +37,15 @@
 
 ## Pages
 - [Home / booking](/index.html): services, live 24/7 online booking, reviews, contact
+- [Engine rebuilds & machining](/services/engine-rebuilds.html): the specialty — in-house rebuilds
+- [Servicing](/services/servicing.html): manufacturer-schedule servicing, genuine/OEM parts
+- [Diagnostics](/services/diagnostics.html): dealer-level fault-finding
+- [Brakes & suspension](/services/brakes-suspension.html)
+- [Electrical & coding](/services/electrical-coding.html): battery registration, module coding
+- [Air conditioning](/services/air-conditioning.html): re-gas and leak detection
+- [Classics & restoration](/services/classics-restoration.html): late-20th-century BMW specialty
+- [Pre-purchase inspections](/services/pre-purchase-inspections.html): written reports
+- [MOT prep & repairs](/services/mot-prep.html)
 - [Missed-call text-back](/systems/textback.html): how the callback system works
 - [MOT & service reminders](/systems/reminders.html): automatic reminder texts
 - [Review engine](/systems/reviews.html): post-job feedback flow
