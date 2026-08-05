@@ -29,6 +29,36 @@ at the host, then find-and-replace the placeholder domain in:
       (top of the booking script in index.html). Any GoHighLevel inbound
       webhook / Make.com / Zapier hook works — bookings arrive as JSON.
 - [ ] Add analytics if wanted: one script tag (Plausible is the clean option).
+- [ ] Make og:image absolute (https://domain/img/og.jpg) and uncomment the
+      canonical tag in index.html.
+
+## Getting found by ChatGPT & AI search — the real playbook
+On-site signals are DONE (robots.txt welcomes OAI-SearchBot/PerplexityBot/
+ClaudeBot etc., llms.txt published, AutoRepair + FAQ schema). What moves the
+needle now is off-site, because ChatGPT's local answers pull from **Bing's
+index, Foursquare's Places API and Yelp** — not just websites:
+
+1. [ ] **Bing Webmaster Tools** (bing.com/webmasters) — verify the domain,
+       submit the sitemap. ChatGPT Search runs on Bing's index; no Bing = no
+       ChatGPT. Enable IndexNow if the host supports it.
+2. [ ] **Bing Places for Business** (bingplaces.com) — claim/create the
+       listing, can import straight from the Google Business Profile.
+3. [ ] **Foursquare listing** (foursquare.com/add-place) — ChatGPT's local
+       results lean heavily on Foursquare's Places API. Free, 10 minutes.
+4. [ ] **Yelp UK listing** (biz.yelp.com) — second major AI data source.
+5. [ ] **NAP consistency** — the name, address and phone must be IDENTICAL
+       everywhere: "Aesir Automotive Ltd · 3d Pond Farm, Newyears Green Lane,
+       Uxbridge UB9 6LX · 07956 658177". Inconsistencies make AI engines
+       drop the business from answers.
+6. [ ] **UK citations** — Yell.com, Thomson Local, FreeIndex, Checkatrade/
+       TrustATrader if Neil wants them. (Already listed on PreferredMechanic.)
+7. [ ] **Keep Google reviews coming** — AI answers quote review language.
+       Reviews that say "BMW specialist near Uxbridge" literally feed the
+       phrasing engines repeat. The site's review-engine system does this.
+8. [ ] Reality check: no code makes anyone "the best in the area" on every
+       engine — rankings come from listings + reviews + consistency + time.
+       Everything technical that CAN be done on-site is done; the 7 steps
+       above are account work (~1 hour total) that needs Tom or Neil.
 
 ## Housekeeping notes
 - `admin.html` (Neil's diary) and `compare.html` (clip picker) are noindexed

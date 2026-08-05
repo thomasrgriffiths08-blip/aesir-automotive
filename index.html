@@ -12,15 +12,23 @@
 <meta property="og:title" content="Æsir Automotive — Independent BMW Specialists, Uxbridge">
 <meta property="og:description" content="Engine rebuilds, dealer-level diagnostics and servicing for everything BMW has ever built. MINI to Rolls-Royce. 5.0★ on Google.">
 <meta property="og:image" content="img/og.jpg">
+<!-- NOTE: og:image must become an ABSOLUTE url (https://domain/img/og.jpg) once live — scrapers ignore relative paths -->
+<meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0a0b0e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "AutoRepair",
+  "@id": "https://aesirautomotive.co.uk/#business",
   "name": "Aesir Automotive Ltd",
-  "alternateName": "Æsir Automotive — BMW Specialists",
-  "description": "Independent BMW specialists: servicing, diagnostics, electrical and full engine rebuilds for BMW-group vehicles, MINI to Rolls-Royce.",
+  "alternateName": ["Æsir Automotive", "Aesir Automotive BMW Specialists"],
+  "description": "Independent BMW specialists in Uxbridge: servicing, dealer-level diagnostics, electrical work and full in-house engine rebuilds for BMW, M cars, MINI and Rolls-Royce — plus late-20th-century classics.",
+  "slogan": "Independent BMW specialists — MINI to Rolls-Royce",
   "telephone": "+447956658177",
+  "identifier": {"@type": "PropertyValue", "propertyID": "UK Companies House", "value": "12705996"},
+  "foundingDate": "2020-06-30",
+  "founder": {"@type": "Person", "name": "Neil Haddow", "jobTitle": "Director & Master Technician"},
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "3d Pond Farm, Newyears Green Lane, Newyears Green",
@@ -30,12 +38,48 @@
     "addressCountry": "GB"
   },
   "geo": {"@type": "GeoCoordinates", "latitude": 51.5812, "longitude": -0.4561},
+  "hasMap": "https://www.google.com/maps/place/Aesir+Automotive+Ltd+bmw+specialist/@51.5811823,-0.4561344,17z",
+  "areaServed": ["Uxbridge", "Harefield", "Ickenham", "Ruislip", "Hillingdon", "Rickmansworth", "Watford", "North West London"],
   "openingHoursSpecification": [
     {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "18:00"}
   ],
   "aggregateRating": {"@type": "AggregateRating", "ratingValue": "5.0", "reviewCount": "20"},
-  "sameAs": ["https://www.instagram.com/aesir.automotive/"],
+  "knowsAbout": ["BMW servicing", "BMW engine rebuilds", "BMW diagnostics", "MINI servicing", "Rolls-Royce maintenance", "classic BMW restoration", "BMW electrical faults", "BMW M cars"],
+  "makesOffer": [
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Engine rebuilds & machining"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Manufacturer-schedule servicing"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Dealer-level engine diagnostics"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Brakes & suspension"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Electrical & coding"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Air conditioning service"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Pre-purchase inspections"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "MOT preparation & repairs"}}
+  ],
+  "sameAs": [
+    "https://www.instagram.com/aesir.automotive/",
+    "https://find-and-update.company-information.service.gov.uk/company/12705996"
+  ],
   "priceRange": "££"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Do you only work on BMWs?",
+     "acceptedAnswer": {"@type": "Answer", "text": "We specialise in the BMW group — BMW, M cars, MINI and Rolls-Royce — plus late-20th-century BMW classics. The occasional Ferrari has been on the ramps too, from an F430 misfire diagnosis to classic work."}},
+    {"@type": "Question", "name": "Do you do full engine rebuilds?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Yes — in-house, on the bench. Bearings, skimmed heads and complete bottom-end rebuilds, from BMW M V10s to classic straight-sixes. Engine work is the workshop's specialty."}},
+    {"@type": "Question", "name": "Where is the workshop?",
+     "acceptedAnswer": {"@type": "Answer", "text": "3d Pond Farm, Newyears Green Lane, Uxbridge UB9 6LX — between Harefield, Ickenham and Ruislip on the north-west edge of London."}},
+    {"@type": "Question", "name": "What are your opening hours?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Monday to Friday, 8am to 6pm. Outside those hours you can book online 24/7 or message the workshop on WhatsApp at 07956 658177."}},
+    {"@type": "Question", "name": "How do I book my car in?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Book online any time at the website's booking section, call or WhatsApp Neil on 07956 658177. Online bookings get an instant confirmation and a reminder text the day before."}},
+    {"@type": "Question", "name": "Who runs Æsir Automotive?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Neil Haddow, director since 2020. It's a one-mechanic workshop — the person you speak to is the person working on your car. Reviewers on Google describe the work as professional, fairly priced and completed to a high standard."}}
+  ]
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -211,6 +255,17 @@ body.ready .veil{opacity:1}
 .about p b{color:var(--ink)}
 .quoteline{border-left:3px solid var(--blue-d);padding:6px 0 6px 20px;margin-top:24px;font-size:15px;color:var(--ink);font-weight:600}
 .quoteline small{display:block;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--dim);font-weight:400;letter-spacing:.14em;margin-top:6px}
+
+/* ============ FAQ ============ */
+.faq{padding:0 0 110px}
+.faq-list{margin-top:44px;border-top:1px solid var(--line)}
+.faq-list details{border-bottom:1px solid var(--line)}
+.faq-list summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 4px;font-weight:700;font-size:16.5px;color:var(--ink);transition:color .2s}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{content:"+";font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--sky);transition:transform .25s;flex:none}
+.faq-list details[open] summary::after{transform:rotate(45deg)}
+.faq-list summary:hover{color:var(--sky)}
+.faq-list .a{padding:0 4px 24px;color:var(--mut);font-size:14.5px;max-width:720px}
 
 /* ============ CONTACT ============ */
 .contact{padding:110px 0 90px;background:
@@ -510,6 +565,42 @@ body.ready .veil{opacity:1}
       <div class="quoteline">"I was recommended to Neil by another garage that couldn't economically fix my BMW 320i."
         <small>— JAGDEEP, GOOGLE REVIEW</small>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="rv">
+      <div class="kicker">Straight answers</div>
+      <h2>Asked all the time.</h2>
+    </div>
+    <div class="faq-list rv">
+      <details>
+        <summary>Do you only work on BMWs?</summary>
+        <div class="a">We specialise in the BMW group — BMW, M cars, MINI and Rolls-Royce — plus late-20th-century BMW classics. The occasional Ferrari has been on the ramps too, from an F430 misfire diagnosis to classic work.</div>
+      </details>
+      <details>
+        <summary>Do you do full engine rebuilds?</summary>
+        <div class="a">Yes — in-house, on the bench. Bearings, skimmed heads and complete bottom-end rebuilds, from BMW M V10s to classic straight-sixes. Engine work is the workshop's specialty.</div>
+      </details>
+      <details>
+        <summary>Where is the workshop?</summary>
+        <div class="a">3d Pond Farm, Newyears Green Lane, Uxbridge UB9 6LX — between Harefield, Ickenham and Ruislip on the north-west edge of London.</div>
+      </details>
+      <details>
+        <summary>What are your opening hours?</summary>
+        <div class="a">Monday to Friday, 8am to 6pm. Outside those hours you can book online 24/7 or message the workshop on WhatsApp at 07956 658177.</div>
+      </details>
+      <details>
+        <summary>How do I book my car in?</summary>
+        <div class="a">Book online any time in the <a href="#book" style="color:var(--sky)">booking section</a>, call or WhatsApp Neil on 07956 658177. Online bookings get an instant confirmation and a reminder text the day before.</div>
+      </details>
+      <details>
+        <summary>Who runs Æsir Automotive?</summary>
+        <div class="a">Neil Haddow, director since 2020. It's a one-mechanic workshop — the person you speak to is the person working on your car. Reviewers on Google describe the work as professional, fairly priced and completed to a high standard.</div>
+      </details>
     </div>
   </div>
 </section>

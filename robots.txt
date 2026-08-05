@@ -1,7 +1,53 @@
+# Æsir Automotive — welcome all search + AI answer engines.
+# AI search crawlers are explicitly allowed so ChatGPT Search, Perplexity,
+# Claude, Copilot and Google AI Overviews can read and cite this site.
+
 User-agent: *
 Allow: /
 Disallow: /admin.html
 Disallow: /compare.html
+
+# --- AI search / answer engines (citation crawlers) ---
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+# AI content guide (llms.txt standard): /llms.txt
 
 # Set the real domain before going live:
 # Sitemap: https://aesirautomotive.co.uk/sitemap.xml
