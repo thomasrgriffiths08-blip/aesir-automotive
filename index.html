@@ -97,6 +97,7 @@
 #cine.out .bar.top{transform:translateY(-101%)}
 #cine.out .bar.bot{transform:translateY(101%)}
 #cine .cap{position:absolute;left:50%;bottom:15.5vh;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.3vw,12px);letter-spacing:.42em;text-transform:uppercase;color:#cfd8e8;white-space:nowrap;opacity:0;transition:opacity .9s .6s}
+@media(max-width:640px){#cine .cap{white-space:normal;text-align:center;width:82vw;letter-spacing:.24em;line-height:2;bottom:17vh}}
 #cine.rolling .cap{opacity:1}
 #cine.out .cap{opacity:0;transition:opacity .3s}
 #cine .mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;opacity:0;transform:scale(.96);transition:opacity 1s ease,transform 1.2s cubic-bezier(.2,.7,.2,1)}
@@ -117,6 +118,9 @@ body.ready .veil{opacity:1}
 /* ============ HERO ============ */
 .hero{height:100svh;min-height:640px;position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
 .hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.9) contrast(1.06)}
+/* never show WebKit's YouTube-style play glyph if autoplay is momentarily blocked */
+video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
+video::-webkit-media-controls{display:none!important}
 .hero .shade{position:absolute;inset:0;z-index:-1;background:
   linear-gradient(180deg,rgba(10,11,14,.6) 0%,rgba(10,11,14,.3) 38%,rgba(10,11,14,.86) 78%,var(--bg) 100%),
   radial-gradient(70% 85% at 16% 58%,rgba(10,11,14,.5),transparent 62%),
@@ -667,9 +671,27 @@ body.ready .veil{opacity:1}
   const hold = q.includes('hold') || forced === 'hold';       /* #intro-hold freezes it */
   const seen = sessionStorage.getItem('aesir_intro');
 
-  /* the video ALWAYS runs — it's the whole point of the hero.
-     Clip is pre-trimmed (video/hero.mp4), no seek needed. */
-  function startVideo(){ vid.play().catch(() => {}); }
+  /* The video ALWAYS runs — it's the whole point of the hero.
+     Mobile gets a 1.5MB 720p rendition for instant start. */
+  vid.muted = true; vid.defaultMuted = true;
+  if (matchMedia('(max-width: 820px)').matches) vid.src = 'video/hero-720.mp4';
+
+  /* If the OS still blocks autoplay (iOS Low Power Mode etc.), the very first
+     touch / scroll / tap anywhere starts it — no visible player, no controls. */
+  let armed = false;
+  function armGestureStart(){
+    if (armed) return; armed = true;
+    const kick = () => {
+      vid.play().then(() => ['touchend','touchstart','click','scroll','keydown']
+        .forEach(e => removeEventListener(e, kick))).catch(() => {});
+    };
+    ['touchend','touchstart','click','scroll','keydown']
+      .forEach(e => addEventListener(e, kick, {passive:true}));
+  }
+  function startVideo(){
+    const p = vid.play();
+    if (p && p.catch) p.catch(armGestureStart);
+  }
 
   if (seen && !force){
     cine.remove();
