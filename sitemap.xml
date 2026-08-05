@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Replace aesirautomotive.co.uk with the real domain before submitting to Search Console -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://aesirautomotive.co.uk/</loc><priority>1.0</priority></url>
+  <url><loc>https://aesirautomotive.co.uk/systems/textback.html</loc><priority>0.6</priority></url>
+  <url><loc>https://aesirautomotive.co.uk/systems/reminders.html</loc><priority>0.6</priority></url>
+  <url><loc>https://aesirautomotive.co.uk/systems/reviews.html</loc><priority>0.6</priority></url>
+</urlset>

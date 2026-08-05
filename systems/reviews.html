@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Engine — Æsir Automotive</title>
+<meta name="description" content="One text after every job. Great experiences go to Google — anything less comes straight back to Neil. See how it works.">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<style>
+.sim{padding:70px 0 100px}
+.sim-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:44px;align-items:start;margin-top:10px}
+.flowcol{display:flex;flex-direction:column;gap:22px}
+.starpick{display:flex;gap:8px;font-size:34px;cursor:pointer;user-select:none}
+.starpick span{color:#39404d;transition:transform .15s,color .15s}
+.starpick span.lit{color:var(--gold)}
+.starpick span:hover{transform:scale(1.2)}
+.gate{border-left:3px solid var(--line);padding-left:18px;margin-top:6px;font-size:13px;color:var(--ink2)}
+.gate b{color:var(--ink)}
+.feed{display:flex;flex-direction:column;gap:14px}
+.gcard{background:var(--panel);border:1px solid var(--line);padding:18px;display:flex;gap:14px;align-items:flex-start;opacity:1;transition:.4s}
+.gcard.new{animation:drop .5s cubic-bezier(.2,1.2,.4,1)}
+@keyframes drop{from{opacity:0;transform:translateY(-14px)}}
+.gcard .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex:none}
+.gcard .stars{font-size:13px}
+.gcard p{font-size:13.5px;color:var(--ink2);margin-top:4px}
+.gcard .who{font-size:12.5px;font-weight:700;color:var(--ink)}
+.gcard .when{font-family:'JetBrains Mono',monospace;font-size:10px;color:#a6b1c2;margin-left:auto;white-space:nowrap}
+.dash{display:flex;align-items:center;gap:18px;background:var(--panel);border:1px solid var(--line);padding:20px 22px;margin-bottom:16px}
+.dash .big{font-size:44px;font-weight:900;line-height:1}
+.dash .meta span{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:var(--ink2)}
+.private{background:rgba(231,34,46,.09);border:1px solid rgba(231,34,46,.3);padding:18px;font-size:13.5px;color:#f0a9ad;display:none}
+.private b{display:block;margin-bottom:4px}
+@media(max-width:960px){.sim-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="site" id="nav">
+  <div class="nav-in">
+    <a class="logo" href="../index.html"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html#services">Services</a>
+      <a href="../index.html#systems" class="here">Systems</a>
+      <a href="../index.html#reviews">Reviews</a>
+      <a href="../index.html#contact">Find us</a>
+    </div>
+    <span class="nav-phone">07956 658177</span>
+    <a class="btn" href="../index.html#book">Book online</a>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="crumb"><a href="../index.html">HOME</a> / <a href="../index.html#systems">SYSTEMS</a> / REVIEW ENGINE</span>
+    <div class="kicker">System 03 · After every job</div>
+    <h1>The Review<br>Engine</h1>
+    <p class="lead">Every customer gets one text: "how did we do?" Five-star experiences flow straight to Google. Anything less comes back to Neil privately, first — so problems get fixed, not published.</p>
+  </div>
+</header>
+
+<section class="sim">
+  <div class="wrap">
+    <div class="rv">
+      <div class="kicker">Try it yourself</div>
+      <h2>Finish a job, <em>watch it work.</em></h2>
+      <p class="lead">Play the customer. Complete a job, get the text, tap a rating — and see where the system routes it. That routing is the whole trick.</p>
+    </div>
+    <div class="sim-grid">
+      <div class="flowcol">
+        <div class="panel pad panel-top rv">
+          <span class="tag">Step 1 · Job complete</span>
+          <label class="f-label">Customer name</label>
+          <input class="f-input" id="jName" placeholder="e.g. James" value="James">
+          <label class="f-label">Car</label>
+          <input class="f-input" id="jCar" placeholder="e.g. M4 Competition" value="M4 Competition">
+          <button class="btn w-cta" id="jDone" style="width:100%;margin-top:20px">Mark job complete →</button>
+        </div>
+        <div class="phone rv" id="askPhone" hidden>
+          <div class="ph-top"><span>SMS · ÆSIR AUTOMOTIVE</span><span id="clock"></span></div>
+          <div class="bubble out show" id="askSms"></div>
+          <div class="bubble in show" style="margin-top:4px">
+            <div style="font-size:11px;color:#9fb4d8;margin-bottom:6px">TAP TO RATE:</div>
+            <div class="starpick" id="starPick"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+          </div>
+        </div>
+        <div class="private rv" id="privateBox">
+          <b>Routed privately — never posted.</b>
+          Anything under four stars opens a private line to Neil instead of a public form. He calls back, fixes it, and the customer usually ends up leaving five stars anyway — for the recovery.
+        </div>
+        <div class="panel pad rv" style="background:var(--paper2)">
+          <span class="tag">Why it's honest</span>
+          <p style="font-size:13.5px;color:var(--ink2);margin-top:10px">The system never writes reviews and never blocks anyone from posting anywhere. It just asks the question at the right moment — and makes sure a bad day gets a phone call before it gets a headline.</p>
+        </div>
+      </div>
+      <div class="rv">
+        <div class="dash">
+          <span class="big" id="avg">5.0</span>
+          <div class="meta">
+            <div class="stars" id="dashStars">★★★★★</div>
+            <span id="cnt">20 GOOGLE REVIEWS</span>
+          </div>
+          <span class="gball" style="margin-left:auto"></span>
+        </div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap f-in">
+    <a class="logo" href="../index.html"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span></a>
+    <span class="mono">© 2026 ÆSIR AUTOMOTIVE LTD · SYSTEM 03 · <a href="../index.html#book">BOOK YOUR CAR IN →</a></span>
+  </div>
+</footer>
+
+<div class="mobar">
+  <a class="btn ghost" href="tel:07956658177">✆ Call</a>
+  <a class="btn" href="../index.html#book">Book online</a>
+</div>
+
+<script src="../js/shared.js"></script>
+<script>
+document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+
+/* seeded with the garage's real Google reviews */
+const SEED = [
+  {name:'Arun', color:'#0066b1', stars:5, when:'5 MO AGO', text:'Neil was highly knowledgeable and took the time to clearly explain the issues with my vehicle. The customer service throughout was outstanding.'},
+  {name:'Yasmeen', color:'#004a86', stars:5, when:'5 MO AGO', text:'He picked up on all the faults with my car quickly and explained everything clearly.'},
+  {name:'Jagdeep', color:'#122c50', stars:4, when:'4 MO AGO', text:'Recommended to Neil by another garage that couldn\'t economically fix my BMW 320i. Impressed by his polite and professional approach.'},
+  {name:'Google reviewer', color:'#e7222e', stars:5, when:'RECENT', text:'The service was professional, fairly priced, and completed to a high standard.'}
+];
+let extra = store.get('demo_reviews', []);
+let count = 20 + extra.filter(r => r.stars >= 4).length;
+
+const feed = document.getElementById('feed');
+function card(r, isNew){
+  const el = document.createElement('div');
+  el.className = 'gcard' + (isNew ? ' new' : '');
+  el.innerHTML = `<span class="av" style="background:${r.color}">${r.name[0]}</span>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:10px"><span class="who">${r.name}</span><span class="when">${r.when}</span></div>
+      <span class="stars">${'★'.repeat(r.stars)}<span class="dim">${'★'.repeat(5 - r.stars)}</span></span>
+      <p>"${r.text}"</p>
+    </div>`;
+  return el;
+}
+function renderFeed(){
+  feed.innerHTML = '';
+  [...extra].reverse().forEach(r => feed.appendChild(card(r, false)));
+  SEED.forEach(r => feed.appendChild(card(r, false)));
+  document.getElementById('cnt').textContent = count + ' GOOGLE REVIEWS';
+}
+renderFeed();
+
+let current = null;
+document.getElementById('jDone').onclick = async () => {
+  const name = document.getElementById('jName').value.trim() || 'James';
+  const car = document.getElementById('jCar').value.trim() || 'your car';
+  current = {name, car};
+  const box = document.getElementById('askPhone');
+  box.hidden = false;
+  document.getElementById('privateBox').style.display = 'none';
+  resetStars();
+  await typeInto(document.getElementById('askSms'),
+    `Cheers for trusting us with the ${car} today, ${name}. One quick question — how did we do? ⭐`, 14);
+  box.scrollIntoView({behavior:'smooth', block:'center'});
+};
+
+const picks = [...document.querySelectorAll('#starPick span')];
+function resetStars(){ picks.forEach(p => p.classList.remove('lit')); }
+picks.forEach((p, i) => {
+  p.onmouseenter = () => picks.forEach((q, j) => q.classList.toggle('lit', j <= i));
+  p.onclick = () => rate(i + 1);
+});
+
+function rate(n){
+  if (!current) return;
+  if (n >= 4){
+    const r = {name: current.name, color:'#0066b1', stars: n, when:'JUST NOW',
+      text:`Brilliant work on the ${current.car} — sorted first time and explained properly.`};
+    extra.push(r); store.set('demo_reviews', extra);
+    count++;
+    renderFeed();
+    const first = feed.firstChild; if (first) first.classList.add('new');
+    toast('Routed to Google — review count is now ' + count);
+  } else {
+    document.getElementById('privateBox').style.display = 'block';
+    toast('Routed privately to Neil — nothing posted', 3800);
+  }
+  current = null;
+}
+</script>
+</body>
+</html>

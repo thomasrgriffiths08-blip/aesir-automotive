@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="10" fill="#0a0b0e"/>
+  <g transform="skewX(-18) translate(18,0)">
+    <rect x="8" y="14" width="7" height="36" fill="#00a0e0"/>
+    <rect x="17" y="14" width="7" height="36" fill="#0066b1"/>
+    <rect x="26" y="14" width="7" height="36" fill="#e7222e"/>
+  </g>
+  <text x="44" y="46" font-family="Archivo,Helvetica,Arial,sans-serif" font-size="34" font-weight="900" fill="#f4f4f1" text-anchor="middle">Æ</text>
+</svg>

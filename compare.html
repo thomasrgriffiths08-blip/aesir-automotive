@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cinematic Picker — Æsir Automotive</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;height:100svh;overflow:hidden;font-family:'Archivo',sans-serif;color:#fff}
+video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}
+.bar{position:fixed;left:0;right:0;height:7vh;background:#000;z-index:2}
+.bar.top{top:0}.bar.bot{bottom:0}
+.mark{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:3;pointer-events:none;text-shadow:0 10px 50px rgba(0,0,0,.7)}
+.mark .row{display:flex;align-items:center;gap:18px;font-weight:900;font-size:clamp(46px,9vw,110px);letter-spacing:.02em;text-transform:uppercase}
+.mstripe{display:inline-flex;height:.72em;transform:skewX(-18deg)}
+.mstripe i{width:.28em}
+.mstripe i:nth-child(1){background:#00a0e0}
+.mstripe i:nth-child(2){background:#0066b1}
+.mstripe i:nth-child(3){background:#e7222e}
+.mark small{font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.2vw,12px);letter-spacing:.5em;color:#b9c4d8}
+.hud{position:fixed;bottom:9vh;left:50%;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:12px}
+.hud .label{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#dfe6f2;background:rgba(0,0,0,.55);padding:8px 18px;border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px)}
+.hud .btns{display:flex;gap:8px}
+.hud button{width:44px;height:44px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.22);color:#dfe6f2;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);transition:.15s}
+.hud button:hover{border-color:#00a0e0;color:#00a0e0}
+.hud button.on{background:#0066b1;border-color:#0066b1;color:#fff}
+.hint{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a93a5}
+</style>
+</head>
+<body>
+<video id="v" muted autoplay loop playsinline></video>
+<div class="bar top"></div><div class="bar bot"></div>
+<div class="mark">
+  <div class="row"><span class="mstripe"><i></i><i></i><i></i></span>ÆSIR</div>
+  <small>AUTOMOTIVE LTD</small>
+</div>
+<div class="hud">
+  <span class="label" id="label"></span>
+  <div class="btns" id="btns"></div>
+  <span class="hint">CLICK A NUMBER OR USE ← → · THIS IS EXACTLY HOW THE INTRO WILL FRAME IT</span>
+</div>
+<script>
+const CLIPS = [
+  {n:'1 · LIVE ON THE SITE — BMW X1, Icelandic highlands (Norse, moody, real BMW)', s:'video/hero.mp4', t:7},
+  {n:'2 · M5 sunset tracking shot (advert-style, not aerial)', s:'https://videos.pexels.com/video-files/30764435/13159875_1920_1080_30fps.mp4', t:3},
+  {n:'3 · Golden country lane, drone follow (warm, most "Uxbridge")', s:'https://videos.pexels.com/video-files/5598967/5598967-hd_1920_1080_30fps.mp4', t:2},
+  {n:'4 · Green mountain pass, epic aerial (Top Gear energy)', s:'https://videos.pexels.com/video-files/18973210/18973210-hd_1920_1080_30fps.mp4', t:3},
+];
+const v = document.getElementById('v'), label = document.getElementById('label'), btns = document.getElementById('btns');
+let cur = 0;
+CLIPS.forEach((c, i) => {
+  const b = document.createElement('button');
+  b.textContent = i + 1;
+  b.onclick = () => show(i);
+  btns.appendChild(b);
+});
+function show(i){
+  cur = i;
+  const c = CLIPS[i];
+  v.src = c.s + '#t=' + c.t;
+  v.play().catch(() => {});
+  label.textContent = c.n;
+  [...btns.children].forEach((b, j) => b.classList.toggle('on', j === i));
+}
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') show((cur + 1) % CLIPS.length);
+  if (e.key === 'ArrowLeft') show((cur + CLIPS.length - 1) % CLIPS.length);
+});
+show(0);
+</script>
+</body>
+</html>

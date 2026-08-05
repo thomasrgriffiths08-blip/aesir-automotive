@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /compare.html
+
+# Set the real domain before going live:
+# Sitemap: https://aesirautomotive.co.uk/sitemap.xml

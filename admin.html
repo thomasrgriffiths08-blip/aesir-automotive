@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop Diary — Æsir Automotive</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<style>
+.diary{padding:70px 0 110px}
+.day-block{margin-top:34px}
+.day-head{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);border-bottom:2px solid var(--ink);padding-bottom:8px;display:flex;justify-content:space-between}
+.day-head b{color:var(--ink)}
+.slot{display:grid;grid-template-columns:86px 1fr auto auto;gap:18px;align-items:center;padding:16px 4px;border-bottom:1px solid var(--line);font-size:14px}
+.slot .time{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--blue);font-size:15px}
+.slot .what b{display:block;text-transform:uppercase;font-size:13.5px;letter-spacing:.03em}
+.slot .what span{color:var(--ink2);font-size:13px}
+.slot .ref{font-family:'JetBrains Mono',monospace;font-size:11px;color:#a6b1c2;letter-spacing:.1em}
+.slot .cancel{background:none;border:1.5px solid var(--line);color:var(--ink2);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:.15s}
+.slot .cancel:hover{border-color:var(--red);color:var(--red)}
+.empty{border:1.5px dashed var(--line);padding:60px 24px;text-align:center;color:#a6b1c2;font-size:14.5px;margin-top:40px}
+.empty a{color:var(--blue);text-decoration:underline}
+</style>
+</head>
+<body>
+
+<nav class="site" id="nav">
+  <div class="nav-in">
+    <a class="logo" href="index.html"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html#services">Services</a>
+      <a href="index.html#systems">Systems</a>
+      <a href="index.html#book">Booking</a>
+    </div>
+    <span class="nav-phone">WORKSHOP VIEW</span>
+    <a class="btn" href="index.html#book">Public site</a>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="crumb"><a href="index.html">HOME</a> / WORKSHOP DIARY</span>
+    <div class="kicker">Neil's view · live diary</div>
+    <h1>Workshop Diary</h1>
+    <p class="lead">Every booking made on the site lands here instantly. Cancel a slot and it reopens on the public booking page straight away.</p>
+  </div>
+</header>
+
+<section class="diary">
+  <div class="wrap">
+    <div class="stat-row rv" style="max-width:640px">
+      <div class="stat-tile"><b id="tCount">0</b><span>Bookings on file</span></div>
+      <div class="stat-tile"><b id="tWeek">0</b><span>In the next 7 days</span></div>
+      <div class="stat-tile"><b><em id="tNext">—</em></b><span>Next arrival</span></div>
+    </div>
+    <div id="diaryList"></div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap f-in">
+    <a class="logo" href="index.html"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span></a>
+    <span class="mono">© 2026 ÆSIR AUTOMOTIVE LTD · INTERNAL — WORKSHOP DIARY</span>
+  </div>
+</footer>
+
+<script src="js/shared.js"></script>
+<script>
+let bookings = store.get('bookings', []);
+const list = document.getElementById('diaryList');
+
+function render(){
+  bookings.sort((a,b) => (a.iso + a.time).localeCompare(b.iso + b.time));
+  document.getElementById('tCount').textContent = bookings.length;
+  const week = bookings.filter(b => {
+    const d = (new Date(b.iso + 'T12:00') - Date.now()) / 864e5;
+    return d > -1 && d < 7;
+  });
+  document.getElementById('tWeek').textContent = week.length;
+  const next = bookings.find(b => new Date(b.iso + 'T' + b.time) >= Date.now());
+  document.getElementById('tNext').textContent = next ? next.time : '—';
+
+  if (!bookings.length){
+    list.innerHTML = '<div class="empty">Diary\'s clear. Bookings made on the <a href="index.html#book">public site</a> appear here the second they\'re confirmed.</div>';
+    return;
+  }
+  const byDay = {};
+  bookings.forEach(b => (byDay[b.iso] = byDay[b.iso] || []).push(b));
+  list.innerHTML = '';
+  Object.keys(byDay).sort().forEach(iso => {
+    const block = document.createElement('div');
+    block.className = 'day-block rv on';
+    const dayName = new Date(iso + 'T12:00').toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+    block.innerHTML = '<div class="day-head"><b>' + dayName.toUpperCase() + '</b><span>' + byDay[iso].length + ' JOB' + (byDay[iso].length > 1 ? 'S' : '') + '</span></div>';
+    byDay[iso].forEach(b => {
+      const row = document.createElement('div');
+      row.className = 'slot';
+      row.innerHTML = `
+        <span class="time">${b.time}</span>
+        <span class="what"><b>${b.svc} — ${b.model || 'car TBC'}</b><span>${b.name} · ${b.phone}${b.reg ? ' · ' + b.reg : ''}</span></span>
+        <span class="ref">${b.ref}</span>
+        <button class="cancel" data-ref="${b.ref}">Cancel</button>`;
+      block.appendChild(row);
+    });
+    list.appendChild(block);
+  });
+}
+render();
+
+list.addEventListener('click', e => {
+  const ref = e.target.dataset.ref;
+  if (!ref) return;
+  const b = bookings.find(x => x.ref === ref);
+  bookings = bookings.filter(x => x.ref !== ref);
+  store.set('bookings', bookings);
+  render();
+  toast(b.time + ' on ' + b.day + ' reopened on the public site');
+});
+</script>
+</body>
+</html>
