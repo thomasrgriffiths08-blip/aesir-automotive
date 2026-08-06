@@ -233,9 +233,10 @@ section{position:relative}
 section>.wrap{position:relative;z-index:1}
 
 /* scroll cue */
-.scroll-cue{position:absolute;left:50%;bottom:88px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.3em;color:var(--mut);z-index:2}
+.scroll-cue{opacity:0;transition:opacity .6s .5s;position:absolute;left:50%;bottom:88px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.3em;color:var(--mut);z-index:2}
 .scroll-cue::after{content:"";width:1px;height:42px;background:linear-gradient(var(--sky),transparent);animation:cue 1.8s ease-in-out infinite}
 @keyframes cue{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+body.ready .scroll-cue{opacity:1}
 @media(max-width:960px){.scroll-cue{display:none}}
 
 /* lightbox */
@@ -255,7 +256,8 @@ section>.wrap{position:relative;z-index:1}
 :focus-visible{outline:2px solid var(--sky);outline-offset:3px}
 
 /* floating WhatsApp button */
-.wa-fab{position:fixed;right:22px;bottom:24px;z-index:1500;width:58px;height:58px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px -8px rgba(37,211,102,.55);transition:transform .25s cubic-bezier(.2,.7,.2,1)}
+.wa-fab.wa-wait{opacity:0;pointer-events:none}
+.wa-fab{transition:opacity .5s, transform .25s cubic-bezier(.2,.7,.2,1);position:fixed;right:22px;bottom:24px;z-index:1500;width:58px;height:58px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px -8px rgba(37,211,102,.55);transition:transform .25s cubic-bezier(.2,.7,.2,1)}
 .wa-fab:hover{transform:scale(1.1)}
 .wa-fab svg{width:30px;height:30px;fill:#fff}
 .wa-fab::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(37,211,102,.5);animation:waPulse 2.4s ease-out infinite}
