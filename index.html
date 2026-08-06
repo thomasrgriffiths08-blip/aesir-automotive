@@ -282,6 +282,8 @@ video::-webkit-media-controls{display:none!important}
 .w-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);text-align:center;margin-top:12px;letter-spacing:.06em}
 .w-success{display:none;text-align:center;padding:26px 8px 8px}
 .w-success .tick{width:64px;height:64px;margin:0 auto 20px;border-radius:50%;border:2.5px solid var(--acc);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--acc);animation:tickIn .5s cubic-bezier(.2,1.4,.4,1)}
+.w-success .tick.fail{border-color:#ffb020;color:#ffb020}
+.w-success p{color:var(--mut);font-size:14px}
 @keyframes tickIn{from{transform:scale(.4);opacity:0}}
 .w-success h3{font-size:20px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
 .w-success .ref{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--acc);letter-spacing:.2em;margin:6px 0 8px}
@@ -637,16 +639,29 @@ section.has-gw{overflow:hidden}
           <div class="chips" id="timeChips"></div>
           <label class="f-label">Your details</label>
           <div class="w-row">
-            <input class="f-input" id="fName" placeholder="Name" autocomplete="name">
-            <input class="f-input" id="fPhone" placeholder="Mobile number" inputmode="tel" autocomplete="tel">
+            <input class="f-input" id="fName" placeholder="Name" autocomplete="name" maxlength="60" aria-label="Your name">
+            <input class="f-input" id="fPhone" placeholder="Mobile number" inputmode="tel" autocomplete="tel" maxlength="20" aria-label="Your mobile number">
           </div>
           <div class="w-row" style="margin-top:12px">
-            <input class="f-input" id="fReg" placeholder="Reg (optional)" style="text-transform:uppercase">
-            <input class="f-input" id="fModel" placeholder="Car (optional)  e.g. 330d">
+            <input class="f-input" id="fReg" placeholder="Reg (optional)" style="text-transform:uppercase" maxlength="10" aria-label="Vehicle registration, optional">
+            <input class="f-input" id="fModel" placeholder="Car (optional)  e.g. 330d" maxlength="40" aria-label="Car model, optional">
           </div>
+          <!-- honeypot: off-screen and hidden from assistive tech; only a bot fills it -->
+          <input id="fCompany" name="company" tabindex="-1" autocomplete="off" aria-hidden="true"
+                 style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
           <button class="btn w-cta" id="wSubmit">Confirm booking →</button>
           <div class="w-note">NO PAYMENT TAKEN · FREE TO RESCHEDULE</div>
           <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--mut)">Hate forms? <a href="https://wa.me/447956658177?text=Hi%20Neil%20—%20can%20I%20book%20my%20car%20in%3F%20It%27s%20a%20" target="_blank" rel="noopener" style="color:#25D366;font-weight:700">WhatsApp Neil instead →</a></div>
+        </div>
+        <div class="w-success" id="wFail">
+          <div class="tick fail">!</div>
+          <h3>Not booked</h3>
+          <p id="bookFailLine" style="margin-bottom:20px"></p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+            <a class="btn" href="tel:07956658177">✆ Call the workshop</a>
+            <a class="btn ghost" href="https://wa.me/447956658177?text=Hi%20Neil%20—%20I%20tried%20to%20book%20online%20and%20it%20didn%27t%20go%20through.%20My%20car%20is%20a%20" target="_blank" rel="noopener">WhatsApp</a>
+          </div>
+          <button class="btn ghost" style="margin-top:18px" id="wRetry">Try again</button>
         </div>
         <div class="w-success" id="wDone">
           <div class="tick">✓</div>
@@ -957,6 +972,12 @@ document.getElementById('wSubmit').onclick = async () => {
   const phone = document.getElementById('fPhone').value.trim();
   const reg = document.getElementById('fReg').value.trim().toUpperCase();
   const model = document.getElementById('fModel').value.trim();
+  const fail = msg => {           /* never tell someone they're booked when they aren't */
+    document.getElementById('bookFailLine').textContent = msg;
+    document.getElementById('wForm').style.display = 'none';
+    document.getElementById('wFail').style.display = 'block';
+    btn.textContent = 'Confirm booking →';
+  };
   const missing = [];
   if (!state.svc) missing.push('a service');
   if (!state.day || !state.time) missing.push('a day & time');
@@ -966,19 +987,44 @@ document.getElementById('wSubmit').onclick = async () => {
     setTimeout(() => btn.textContent = 'Confirm booking →', 1800);
     return;
   }
+  if (document.getElementById('fCompany').value){ return; }   /* honeypot: bots fill it, people can't see it */
+  if (!/^(\+?44|0)[\d\s()-]{9,}$/.test(phone)){
+    btn.textContent = 'Check that mobile number ↑';
+    setTimeout(() => btn.textContent = 'Confirm booking →', 2200);
+    return;
+  }
   btn.textContent = 'Confirming…';
   const iso = dayISO(), time = state.time;
   DB = await dbGet();                       /* fresh diary — no double-booking across devices */
+  if (DB.closedDays.includes(iso)){
+    buildDays(); renderTimes(); step();
+    btn.textContent = 'Neil just closed that day — pick another ↑';
+    setTimeout(() => btn.textContent = 'Confirm booking →', 2600);
+    return;
+  }
   if (isTaken(iso, time)){
     renderTimes(); step();
     btn.textContent = 'That slot just went — pick another ↑';
     setTimeout(() => btn.textContent = 'Confirm booking →', 2400);
     return;
   }
-  const ref = 'AES-' + String(1000 + DB.bookings.length + Math.floor(Math.random() * 90)).slice(-4);
+  /* timestamp-based so two bookings can never share a reference — the old
+     length+random scheme collided constantly, and admin cancels by ref */
+  const ref = 'AES-' + Date.now().toString(36).slice(-4).toUpperCase() +
+              Math.floor(Math.random() * 36).toString(36).toUpperCase();
   const booking = {ref, svc: state.svc, day: state.day, iso, time, name, phone, reg, model, ts: Date.now()};
   DB.bookings.push(booking);
-  await dbPut(DB);
+  const saved = await dbPut(DB);
+  if (saved === 'taken'){
+    DB = await dbGet(); renderTimes(); step();
+    btn.textContent = 'That slot just went — pick another ↑';
+    setTimeout(() => btn.textContent = 'Confirm booking →', 2400);
+    return;
+  }
+  if (!saved){
+    fail('We couldn’t reach the diary just now, so this booking has NOT been saved. Call or WhatsApp and we’ll put you straight in.');
+    return;
+  }
   if (BOOKING_WEBHOOK) fetch(BOOKING_WEBHOOK, {
     method: 'POST', headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({source: 'aesir-website', ...booking})
@@ -993,6 +1039,10 @@ document.getElementById('wSubmit').onclick = async () => {
   document.getElementById('wDone').style.display = 'block';
   btn.textContent = 'Confirm booking →';
   toast('Slot ' + time + ' locked in the live diary');
+};
+document.getElementById('wRetry').onclick = () => {
+  document.getElementById('wFail').style.display = 'none';
+  document.getElementById('wForm').style.display = 'block';
 };
 document.getElementById('wAgain').onclick = async () => {
   document.getElementById('wDone').style.display = 'none';

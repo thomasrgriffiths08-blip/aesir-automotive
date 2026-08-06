@@ -15,7 +15,11 @@ document.querySelectorAll('.rv').forEach(el => io.observe(el));
 function toast(msg, ms = 3200){
   let t = document.querySelector('.toast');
   if (!t){ t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
-  t.innerHTML = '<span class="ok">✓</span><span>' + msg + '</span>';
+  /* msg can carry customer-supplied text — set it as text, never as markup */
+  t.textContent = '';
+  const ok = document.createElement('span'); ok.className = 'ok'; ok.textContent = '✓';
+  const m = document.createElement('span'); m.textContent = msg;
+  t.append(ok, m);
   requestAnimationFrame(() => t.classList.add('show'));
   clearTimeout(t._h);
   t._h = setTimeout(() => t.classList.remove('show'), ms);

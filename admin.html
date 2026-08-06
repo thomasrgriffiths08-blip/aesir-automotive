@@ -131,7 +131,8 @@ const fmtDay = d => d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric'
 function setSync(ok){
   const el = document.getElementById('sync');
   el.className = 'sync' + (ok ? '' : ' err');
-  el.innerHTML = ok ? '<b>●</b> LIVE — SYNCED' : '<b>●</b> OFFLINE — CHANGES QUEUED LOCALLY';
+  /* it never queued anything — saying so hid failed edits from Neil */
+  el.innerHTML = ok ? '<b>●</b> LIVE — SYNCED' : '<b>●</b> NOT SAVED — CHECK CONNECTION &amp; RETRY';
 }
 async function save(){
   setSync(await dbPut(DB));
@@ -152,6 +153,9 @@ function render(){
 
     const el = document.createElement('div');
     el.className = 'day' + (closed ? ' closed' : '');
+    /* Booking fields are attacker-controlled — anyone can submit the public form —
+       so they are never interpolated into innerHTML. Structure via innerHTML,
+       customer data via textContent. */
     el.innerHTML = `<div class="day-top"><b>${fmtDay(d)}${n === 0 ? ' · today' : ''}</b>
       <span class="cnt">${dayBk.length ? dayBk.length + ' BOOKED' : ''}</span>
       <button class="closebtn" data-iso="${iso}">${closed ? 'Closed — reopen' : 'Close day'}</button></div>
@@ -159,10 +163,32 @@ function render(){
         const bk = dayBk.find(b => b.time === t);
         const cls = bk ? 'booked' : (blocked.includes(t) ? 'blocked' : '');
         return `<button class="slot-t ${cls}" data-iso="${iso}" data-t="${t}" ${bk ? 'disabled' : ''}>${t}</button>`;
-      }).join('')}</div>
-      ${dayBk.length ? `<div class="bkg">${dayBk.map(b =>
-        `<div class="bk"><b>${b.time}</b><span>${b.svc} — ${b.name}${b.model ? ' · ' + b.model : ''}</span>
-         <span class="mono">${b.phone || ''}</span><button data-ref="${b.ref}">Cancel</button></div>`).join('')}</div>` : ''}`;
+      }).join('')}</div>`;
+    if (dayBk.length){
+      const wrap = document.createElement('div');
+      wrap.className = 'bkg';
+      dayBk.forEach(b => {
+        const row = document.createElement('div');
+        row.className = 'bk';
+        const t = document.createElement('b'); t.textContent = b.time;
+        const who = document.createElement('span');
+        who.textContent = b.svc + ' — ' + b.name + (b.model ? ' · ' + b.model : '') + (b.reg ? ' · ' + b.reg : '');
+        const tel = document.createElement('a');
+        tel.className = 'mono'; tel.textContent = b.phone || '';
+        if (b.phone) tel.href = 'tel:' + String(b.phone).replace(/[^\d+]/g, '');
+        const wa = document.createElement('a');
+        wa.className = 'mono'; wa.textContent = b.phone ? 'WA' : '';
+        if (b.phone) {
+          wa.href = 'https://wa.me/' + String(b.phone).replace(/[^\d]/g, '').replace(/^0/, '44');
+          wa.target = '_blank'; wa.rel = 'noopener';
+        }
+        const x = document.createElement('button');
+        x.textContent = 'Cancel'; x.dataset.ref = b.ref;
+        row.append(t, who, tel, wa, x);
+        wrap.appendChild(row);
+      });
+      el.appendChild(wrap);
+    }
     daysEl.appendChild(el);
   }
   document.getElementById('stBook').textContent = bookAhead;

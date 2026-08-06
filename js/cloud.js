@@ -7,13 +7,20 @@ function dbNormal(d){
   d = d || {};
   return {blocked: d.blocked || {}, closedDays: d.closedDays || [], bookings: d.bookings || [], updated: d.updated || 0};
 }
+/* The public page needs to know a slot is GONE, not who took it. Only the admin
+   diary caches full records, and only in the session that signed into it. */
+const IS_ADMIN = /admin\.html$/.test(location.pathname);
+const stripPersonal = d => ({
+  blocked: d.blocked, closedDays: d.closedDays, updated: d.updated,
+  bookings: (d.bookings || []).map(b => ({iso: b.iso, time: b.time}))
+});
 async function dbGet(){
   try {
     const r = await fetch(AESIR_DB_URL, {cache: 'no-store'});
     if (!r.ok) throw new Error(r.status);
-    const d = await r.json();
-    localStorage.setItem('aesir_dbcache', JSON.stringify(d));
-    return dbNormal(d);
+    const d = dbNormal(await r.json());
+    localStorage.setItem('aesir_dbcache', JSON.stringify(IS_ADMIN ? d : stripPersonal(d)));
+    return d;
   } catch(e){
     try { return dbNormal(JSON.parse(localStorage.getItem('aesir_dbcache'))); }
     catch(_) { return dbNormal(null); }
@@ -21,7 +28,7 @@ async function dbGet(){
 }
 async function dbPut(d){
   d.updated = Date.now();
-  localStorage.setItem('aesir_dbcache', JSON.stringify(d));
+  localStorage.setItem('aesir_dbcache', JSON.stringify(IS_ADMIN ? d : stripPersonal(d)));
   try {
     const r = await fetch(AESIR_DB_URL, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(d)});
     return r.ok;
