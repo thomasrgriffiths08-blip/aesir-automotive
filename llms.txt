@@ -36,6 +36,10 @@
 - BMW Z3 M Coupé — S50B32 engine rebuild and refit
 
 ## Pages
+- [About / the workshop](/about.html): Neil Haddow, company history, the Norse name
+- [Gallery — real work](/gallery.html): photos of actual jobs
+- [Reviews](/reviews.html): all Google review quotes
+- [Contact & directions](/contact.html)
 - [Home / booking](/index.html): services, live 24/7 online booking, reviews, contact
 - [Engine rebuilds & machining](/services/engine-rebuilds.html): the specialty — in-house rebuilds
 - [Servicing](/services/servicing.html): manufacturer-schedule servicing, genuine/OEM parts

@@ -4,123 +4,194 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Workshop Diary — Æsir Automotive</title>
-<meta name="robots" content="noindex">
+<meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/site.css">
 <style>
-.diary{padding:70px 0 110px}
-.day-block{margin-top:34px}
-.day-head{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);border-bottom:2px solid var(--ink);padding-bottom:8px;display:flex;justify-content:space-between}
-.day-head b{color:var(--ink)}
-.slot{display:grid;grid-template-columns:86px 1fr auto auto;gap:18px;align-items:center;padding:16px 4px;border-bottom:1px solid var(--line);font-size:14px}
-.slot .time{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--blue);font-size:15px}
-.slot .what b{display:block;text-transform:uppercase;font-size:13.5px;letter-spacing:.03em}
-.slot .what span{color:var(--ink2);font-size:13px}
-.slot .ref{font-family:'JetBrains Mono',monospace;font-size:11px;color:#a6b1c2;letter-spacing:.1em}
-.slot .cancel{background:none;border:1.5px solid var(--line);color:var(--ink2);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:.15s}
-.slot .cancel:hover{border-color:var(--red);color:var(--red)}
-.empty{border:1.5px dashed var(--line);padding:60px 24px;text-align:center;color:#a6b1c2;font-size:14.5px;margin-top:40px}
-.empty a{color:var(--blue);text-decoration:underline}
+body{padding-bottom:40px}
+/* PIN gate */
+.gate{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:26px;padding:24px}
+.gate .logo{font-size:26px}
+.gate p{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+.pin-row{display:flex;gap:12px}
+.pin-row input{width:58px;height:66px;background:var(--panel);border:1.5px solid var(--line);color:var(--ink);font-size:26px;font-weight:800;text-align:center;outline:none;border-radius:6px;font-family:'JetBrains Mono',monospace}
+.pin-row input:focus{border-color:var(--sky)}
+.gate .err{color:#ff5b64;font-size:12px;height:16px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
+
+.admin{max-width:720px;margin:0 auto;padding:96px 16px 40px}
+.a-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.a-head h1{font-size:clamp(26px,6vw,38px)}
+.sync{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+.sync b{color:#3fd68a}
+.sync.err b{color:#ff5b64}
+.a-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:18px 0 26px}
+.a-stats div{background:var(--panel);padding:14px 16px}
+.a-stats b{display:block;font-size:24px;font-weight:800;color:var(--ink)}
+.a-stats span{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.hint{font-size:13px;color:var(--mut);margin-bottom:22px;border-left:3px solid var(--blue-d);padding-left:14px}
+.day{background:var(--panel);border:1px solid var(--line);margin-bottom:14px;overflow:hidden}
+.day-top{display:flex;align-items:center;gap:12px;padding:15px 16px;border-bottom:1px solid var(--line)}
+.day-top b{font-size:15px;text-transform:uppercase;letter-spacing:.04em;flex:1}
+.day-top .cnt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:.1em}
+.closebtn{background:none;border:1.5px solid var(--line);color:var(--mut);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:8px 13px;cursor:pointer;transition:.15s;font-family:'JetBrains Mono',monospace}
+.closebtn:hover{border-color:#ff5b64;color:#ff5b64}
+.day.closed .closebtn{background:rgba(231,49,34,.16);border-color:#ff5b64;color:#ff5b64}
+.slots{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px}
+.slot-t{background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);font-size:13px;font-weight:600;padding:10px 0;width:calc(25% - 6px);text-align:center;cursor:pointer;transition:.15s;font-family:'JetBrains Mono',monospace}
+.slot-t.blocked{background:rgba(231,49,34,.13);border-color:rgba(231,49,34,.5);color:#ff8a90;text-decoration:line-through}
+.slot-t.booked{background:rgba(16,50,232,.18);border-color:var(--blue-d);color:#9fb1ff;cursor:default}
+.day.closed .slots{opacity:.35;pointer-events:none}
+.bkg{padding:0 16px 14px;display:flex;flex-direction:column;gap:8px}
+.bk{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);padding:10px 12px;font-size:13px}
+.bk b{color:var(--ink)}
+.bk .mono{font-size:10px;color:var(--mut)}
+.bk button{margin-left:auto;background:none;border:1px solid var(--line);color:var(--mut);font-size:10px;letter-spacing:.08em;padding:6px 10px;cursor:pointer;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.bk button:hover{border-color:#ff5b64;color:#ff5b64}
+.legend{display:flex;gap:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mut);letter-spacing:.1em;margin-bottom:18px;flex-wrap:wrap}
+.legend i{display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px;border:1px solid var(--line)}
+.legend .b1{background:rgba(231,49,34,.3)}
+.legend .b2{background:rgba(16,50,232,.35)}
 </style>
 </head>
 <body>
 
-<nav class="site" id="nav">
+<!-- PIN GATE -->
+<div class="gate" id="gate">
+  <a class="logo"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>WORKSHOP&nbsp;DIARY</small></span></a>
+  <p>Enter workshop PIN</p>
+  <div class="pin-row" id="pinRow">
+    <input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1">
+  </div>
+  <div class="err" id="pinErr"></div>
+</div>
+
+<nav class="site solid" id="nav">
   <div class="nav-in">
     <a class="logo" href="index.html"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span></a>
-    <div class="nav-links" id="navLinks">
-      <a href="index.html#services">Services</a>
-      <a href="index.html#systems">Systems</a>
-      <a href="index.html#book">Booking</a>
-    </div>
-    <span class="nav-phone">WORKSHOP VIEW</span>
-    <a class="btn" href="index.html#book">Public site</a>
-    <button class="burger" id="burger" aria-label="Menu">☰</button>
+    <span class="nav-phone" style="margin-left:auto">NEIL'S VIEW</span>
   </div>
 </nav>
 
-<header class="page-hero">
-  <div class="wrap">
-    <span class="crumb"><a href="index.html">HOME</a> / WORKSHOP DIARY</span>
-    <div class="kicker">Neil's view · live diary</div>
+<main class="admin">
+  <div class="a-head">
     <h1>Workshop Diary</h1>
-    <p class="lead">Every booking made on the site lands here instantly. Cancel a slot and it reopens on the public booking page straight away.</p>
+    <span class="sync" id="sync"><b>●</b> LIVE</span>
   </div>
-</header>
-
-<section class="diary">
-  <div class="wrap">
-    <div class="stat-row rv" style="max-width:640px">
-      <div class="stat-tile"><b id="tCount">0</b><span>Bookings on file</span></div>
-      <div class="stat-tile"><b id="tWeek">0</b><span>In the next 7 days</span></div>
-      <div class="stat-tile"><b><em id="tNext">—</em></b><span>Next arrival</span></div>
-    </div>
-    <div id="diaryList"></div>
+  <div class="a-stats">
+    <div><b id="stBook">0</b><span>Bookings ahead</span></div>
+    <div><b id="stBlock">0</b><span>Blocked slots</span></div>
+    <div><b id="stClosed">0</b><span>Days closed</span></div>
   </div>
-</section>
-
-<footer class="site">
-  <div class="wrap f-in">
-    <a class="logo" href="index.html"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span></a>
-    <span class="mono">© 2026 ÆSIR AUTOMOTIVE LTD · INTERNAL — WORKSHOP DIARY</span>
+  <p class="hint"><b style="color:var(--ink)">Tap a time to block or unblock it.</b> Tap "Close day" to take a whole day off. Changes go live on the website instantly — customers can only book what's left open.</p>
+  <div class="legend">
+    <span><i class="b1"></i>BLOCKED BY YOU</span>
+    <span><i class="b2"></i>CUSTOMER BOOKING</span>
+    <span><i></i>OPEN</span>
   </div>
-</footer>
+  <div id="days"></div>
+</main>
 
 <script src="js/shared.js"></script>
+<script src="js/cloud.js"></script>
 <script>
-let bookings = store.get('bookings', []);
-const list = document.getElementById('diaryList');
-
-function render(){
-  bookings.sort((a,b) => (a.iso + a.time).localeCompare(b.iso + b.time));
-  document.getElementById('tCount').textContent = bookings.length;
-  const week = bookings.filter(b => {
-    const d = (new Date(b.iso + 'T12:00') - Date.now()) / 864e5;
-    return d > -1 && d < 7;
+/* ---- PIN gate (change PIN here) ---- */
+const PIN = '8177';   /* last four of the workshop number — easy for Neil to remember */
+const gate = document.getElementById('gate');
+const pins = [...document.querySelectorAll('#pinRow input')];
+if (sessionStorage.getItem('aesir_admin') === '1') gate.remove(); else pins[0].focus();
+pins.forEach((p, i) => {
+  p.addEventListener('input', () => {
+    if (p.value && i < 3) pins[i + 1].focus();
+    const code = pins.map(x => x.value).join('');
+    if (code.length === 4){
+      if (code === PIN){ sessionStorage.setItem('aesir_admin', '1'); gate.remove(); boot(); }
+      else { document.getElementById('pinErr').textContent = 'WRONG PIN'; pins.forEach(x => x.value = ''); pins[0].focus(); }
+    }
   });
-  document.getElementById('tWeek').textContent = week.length;
-  const next = bookings.find(b => new Date(b.iso + 'T' + b.time) >= Date.now());
-  document.getElementById('tNext').textContent = next ? next.time : '—';
-
-  if (!bookings.length){
-    list.innerHTML = '<div class="empty">Diary\'s clear. Bookings made on the <a href="index.html#book">public site</a> appear here the second they\'re confirmed.</div>';
-    return;
-  }
-  const byDay = {};
-  bookings.forEach(b => (byDay[b.iso] = byDay[b.iso] || []).push(b));
-  list.innerHTML = '';
-  Object.keys(byDay).sort().forEach(iso => {
-    const block = document.createElement('div');
-    block.className = 'day-block rv on';
-    const dayName = new Date(iso + 'T12:00').toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
-    block.innerHTML = '<div class="day-head"><b>' + dayName.toUpperCase() + '</b><span>' + byDay[iso].length + ' JOB' + (byDay[iso].length > 1 ? 'S' : '') + '</span></div>';
-    byDay[iso].forEach(b => {
-      const row = document.createElement('div');
-      row.className = 'slot';
-      row.innerHTML = `
-        <span class="time">${b.time}</span>
-        <span class="what"><b>${b.svc} — ${b.model || 'car TBC'}</b><span>${b.name} · ${b.phone}${b.reg ? ' · ' + b.reg : ''}</span></span>
-        <span class="ref">${b.ref}</span>
-        <button class="cancel" data-ref="${b.ref}">Cancel</button>`;
-      block.appendChild(row);
-    });
-    list.appendChild(block);
-  });
-}
-render();
-
-list.addEventListener('click', e => {
-  const ref = e.target.dataset.ref;
-  if (!ref) return;
-  const b = bookings.find(x => x.ref === ref);
-  bookings = bookings.filter(x => x.ref !== ref);
-  store.set('bookings', bookings);
-  render();
-  toast(b.time + ' on ' + b.day + ' reopened on the public site');
+  p.addEventListener('keydown', e => { if (e.key === 'Backspace' && !p.value && i > 0) pins[i - 1].focus(); });
 });
+
+/* ---- diary ---- */
+const TIMES = ['08:00','08:30','09:30','10:30','12:00','14:00','15:30','16:30'];
+let DB = null;
+const daysEl = document.getElementById('days');
+const fmtDay = d => d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+
+function setSync(ok){
+  const el = document.getElementById('sync');
+  el.className = 'sync' + (ok ? '' : ' err');
+  el.innerHTML = ok ? '<b>●</b> LIVE — SYNCED' : '<b>●</b> OFFLINE — CHANGES QUEUED LOCALLY';
+}
+async function save(){
+  setSync(await dbPut(DB));
+  render();
+}
+function render(){
+  const today = new Date();
+  let bookAhead = 0, blockCnt = 0;
+  daysEl.innerHTML = '';
+  for (let n = 0; n < 14; n++){
+    const d = new Date(today); d.setDate(d.getDate() + n);
+    if (d.getDay() === 0) continue;
+    const iso = d.toISOString().slice(0,10);
+    const closed = DB.closedDays.includes(iso);
+    const blocked = DB.blocked[iso] || [];
+    const dayBk = DB.bookings.filter(b => b.iso === iso);
+    bookAhead += dayBk.length; blockCnt += closed ? 0 : blocked.length;
+
+    const el = document.createElement('div');
+    el.className = 'day' + (closed ? ' closed' : '');
+    el.innerHTML = `<div class="day-top"><b>${fmtDay(d)}${n === 0 ? ' · today' : ''}</b>
+      <span class="cnt">${dayBk.length ? dayBk.length + ' BOOKED' : ''}</span>
+      <button class="closebtn" data-iso="${iso}">${closed ? 'Closed — reopen' : 'Close day'}</button></div>
+      <div class="slots">${TIMES.map(t => {
+        const bk = dayBk.find(b => b.time === t);
+        const cls = bk ? 'booked' : (blocked.includes(t) ? 'blocked' : '');
+        return `<button class="slot-t ${cls}" data-iso="${iso}" data-t="${t}" ${bk ? 'disabled' : ''}>${t}</button>`;
+      }).join('')}</div>
+      ${dayBk.length ? `<div class="bkg">${dayBk.map(b =>
+        `<div class="bk"><b>${b.time}</b><span>${b.svc} — ${b.name}${b.model ? ' · ' + b.model : ''}</span>
+         <span class="mono">${b.phone || ''}</span><button data-ref="${b.ref}">Cancel</button></div>`).join('')}</div>` : ''}`;
+    daysEl.appendChild(el);
+  }
+  document.getElementById('stBook').textContent = bookAhead;
+  document.getElementById('stBlock').textContent = blockCnt;
+  document.getElementById('stClosed').textContent = DB.closedDays.length;
+}
+daysEl && daysEl.addEventListener('click', e => {
+  if (!DB) return;
+  const t = e.target;
+  if (t.classList.contains('slot-t') && !t.classList.contains('booked')){
+    const iso = t.dataset.iso, tm = t.dataset.t;
+    const arr = DB.blocked[iso] = DB.blocked[iso] || [];
+    const i = arr.indexOf(tm);
+    i >= 0 ? arr.splice(i, 1) : arr.push(tm);
+    if (!arr.length) delete DB.blocked[iso];
+    save(); return;
+  }
+  if (t.classList.contains('closebtn')){
+    const iso = t.dataset.iso;
+    const i = DB.closedDays.indexOf(iso);
+    i >= 0 ? DB.closedDays.splice(i, 1) : DB.closedDays.push(iso);
+    save(); return;
+  }
+  if (t.dataset.ref){
+    const b = DB.bookings.find(x => x.ref === t.dataset.ref);
+    DB.bookings = DB.bookings.filter(x => x.ref !== t.dataset.ref);
+    save();
+    toast((b ? b.time + ' ' : '') + 'reopened on the website');
+  }
+});
+async function boot(){
+  DB = await dbGet();
+  setSync(true);
+  render();
+  setInterval(async () => { if (document.visibilityState === 'visible'){ DB = await dbGet(); render(); } }, 30000);
+}
+if (sessionStorage.getItem('aesir_admin') === '1') boot();
 </script>
 </body>
 </html>

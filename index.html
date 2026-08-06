@@ -117,9 +117,11 @@ body.ready .veil{opacity:1}
 
 /* ============ HERO ============ */
 .hero{height:100svh;min-height:640px;position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
-.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.9) contrast(1.06);animation:kb 34s ease-in-out infinite alternate}
+.hero-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-3;filter:saturate(.9) contrast(1.06);animation:kb 34s ease-in-out infinite alternate}
+.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.9) contrast(1.06);animation:kb 34s ease-in-out infinite alternate;opacity:0;transition:opacity .7s ease}
+body.vplay .hero video{opacity:1}
 @keyframes kb{from{transform:scale(1)}to{transform:scale(1.08)}}
-@media (prefers-reduced-motion: reduce){.hero video{animation:none}}
+@media (prefers-reduced-motion: reduce){.hero video,.hero-poster{animation:none}}
 /* staggered hero entrance once the intro lets go */
 .hero-inner>*{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.75,.2,1)}
 .hero-inner>*:nth-child(1){transition-delay:.05s}
@@ -361,8 +363,14 @@ section.has-gw{overflow:hidden}
 
 <!-- ============ HERO ============ -->
 <header class="hero" id="top">
-  <video id="heroVid" loop muted playsinline preload="auto" autoplay
-    poster="video/poster.jpg" src="video/hero.mp4"></video>
+  <img class="hero-poster" src="video/poster.jpg" alt="" aria-hidden="true">
+  <video id="heroVid" loop muted playsinline preload="auto" autoplay></video>
+  <script>
+    (function(){ var v = document.getElementById('heroVid');
+      v.src = matchMedia('(max-width: 820px)').matches ? 'video/hero-720.mp4' : 'video/hero.mp4';
+      v.addEventListener('playing', function(){ document.body.classList.add('vplay'); }, {once:true});
+    })();
+  </script>
   <div class="shade"></div>
   <div class="wrap hero-inner">
     <div class="g-badge"><span class="gball"></span><span class="stars">★★★★★</span><span><b>5.0</b> · 20 GOOGLE REVIEWS</span></div>
@@ -429,7 +437,7 @@ section.has-gw{overflow:hidden}
         <div class="kicker">Straight off the bench</div>
         <h2>Real work. <em>Real cars.</em></h2>
       </div>
-      <a class="ig" href="https://www.instagram.com/aesir.automotive/" target="_blank" rel="noopener">FOLLOW THE FEED → @AESIR.AUTOMOTIVE</a>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="ig" href="gallery.html">FULL GALLERY →</a><a class="ig" href="https://www.instagram.com/aesir.automotive/" target="_blank" rel="noopener">@AESIR.AUTOMOTIVE</a></div>
     </div>
     <div class="feed-grid">
       <div class="shot tall rv" data-cursor="VIEW"><img src="img/z3-workshop.jpg" alt="Z3 M Coupé on the ramp, S50 engine out"><span class="cap"><b>Z3 M COUPÉ</b> · S50B32 fired straight up</span></div>
@@ -438,7 +446,7 @@ section.has-gw{overflow:hidden}
       <div class="shot tall rv" data-cursor="VIEW"><img src="img/f430.jpg" alt="Ferrari F430 in the workshop"><span class="cap"><b>FERRARI F430</b> · multiple misfires</span></div>
       <div class="shot rv" data-cursor="VIEW"><img src="img/bearings.jpg" alt="E60 M5 big end bearings"><span class="cap"><b>E60 M5</b> · big ends — close shave</span></div>
       <div class="shot rv" data-cursor="VIEW"><img src="img/m20-head.jpg" alt="BMW M20 cylinder head"><span class="cap"><b>M20 STRAIGHT-SIX</b> · head rebuild</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/spirit.jpg" alt="Rolls-Royce Spirit of Ecstasy repair" style="object-position:center 60%"><span class="cap"><b>SPIRIT OF ECSTASY</b> · back in working order</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/e30-bay.jpg" alt="Classic BMW E30 M20 engine bay" style="object-position:center 45%"><span class="cap"><b>E30 CLASSIC</b> · "oh dear, M20B25 feeling the heat"</span></div>
       <div class="shot rv" data-cursor="VIEW"><img src="img/i8.jpg" alt="BMW i8" style="object-position:center 45%"><span class="cap"><b>BMW i8</b> · "what a car!!!!"</span></div>
       <div class="shot wide rv" data-cursor="VIEW"><img src="img/z3-sunset.jpg" alt="Z3 M road test at sunset" style="object-position:center 55%"><span class="cap"><b>TESTED &amp; READY</b> · "see you in 600 miles yeah?!"</span></div>
       <div class="shot rv" data-cursor="VIEW"><img src="img/ferrari-classic.jpg" alt="Classic Ferrari" style="object-position:center 55%"><span class="cap"><b>75 YEARS OF FERRARI</b> · Silverstone Classic</span></div>
@@ -545,6 +553,7 @@ section.has-gw{overflow:hidden}
           <span class="theme"><b>×3</b> communication</span>
           <span class="theme"><b>×2</b> clear explanations</span>
           <span class="theme"><b>×2</b> transparency</span>
+          <a class="theme" href="reviews.html" style="color:var(--sky)">ALL REVIEWS →</a>
         </div>
       </div>
       <div class="score">
@@ -590,6 +599,7 @@ section.has-gw{overflow:hidden}
       <div class="quoteline">"I was recommended to Neil by another garage that couldn't economically fix my BMW 320i."
         <small>— JAGDEEP, GOOGLE REVIEW</small>
       </div>
+      <div class="hero-ctas" style="margin-top:26px"><a class="btn ghost" href="about.html">The full story →</a></div>
     </div>
   </div>
 </section>
@@ -661,12 +671,20 @@ section.has-gw{overflow:hidden}
 
 <!-- ============ FOOTER ============ -->
 <footer class="site">
+  <div class="wrap" style="display:flex;gap:22px;flex-wrap:wrap;padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase">
+    <a href="about.html" style="color:var(--mut)">About</a>
+    <a href="gallery.html" style="color:var(--mut)">Gallery</a>
+    <a href="reviews.html" style="color:var(--mut)">Reviews</a>
+    <a href="contact.html" style="color:var(--mut)">Contact</a>
+    <a href="services/engine-rebuilds.html" style="color:var(--mut)">Engine Rebuilds</a>
+    <a href="https://www.instagram.com/aesir.automotive/" target="_blank" rel="noopener" style="color:var(--mut)">Instagram</a>
+  </div>
   <div class="wrap f-in">
     <a class="logo" href="#top">
       <span class="mstripe"><i></i><i></i><i></i></span>
       <span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span>
     </a>
-    <span class="mono"><span id="uxClock"></span> · © 2026 ÆSIR AUTOMOTIVE LTD · CO. 12705996 · INDEPENDENT — NOT AFFILIATED WITH BMW AG OR ROLLS-ROYCE MOTOR CARS · <a href="admin.html">DIARY</a></span>
+    <span class="mono"><span id="uxClock"></span> · © 2026 ÆSIR AUTOMOTIVE LTD · CO. 12705996 · INDEPENDENT — NOT AFFILIATED WITH BMW AG OR ROLLS-ROYCE MOTOR CARS</span>
   </div>
 </footer>
 
@@ -684,6 +702,7 @@ section.has-gw{overflow:hidden}
 </div>
 
 <script src="js/shared.js"></script>
+<script src="js/cloud.js"></script>
 <script>
 /* ============ CINEMATIC INTRO → LIVE HERO ============ */
 (function(){
@@ -701,7 +720,6 @@ section.has-gw{overflow:hidden}
   /* The video ALWAYS runs — it's the whole point of the hero.
      Mobile gets a 1.5MB 720p rendition for instant start. */
   vid.muted = true; vid.defaultMuted = true;
-  if (matchMedia('(max-width: 820px)').matches) vid.src = 'video/hero-720.mp4';
 
   /* If the OS still blocks autoplay (iOS Low Power Mode etc.), the very first
      touch / scroll / tap anywhere starts it — no visible player, no controls. */
@@ -778,7 +796,7 @@ const BOOKING_WEBHOOK = '';
 const SERVICES = ['Service & Oil','Diagnostics','Brakes','Air Con','Electrical','MOT Prep','Engine work','Something else'];
 const TIMES = ['08:00','08:30','09:30','10:30','12:00','14:00','15:30','16:30'];
 const state = {svc:null, day:null, time:null};
-const bookings = store.get('bookings', []);
+let DB = {blocked:{}, closedDays:[], bookings:[]};
 
 function chip(txt, group, key, onSel){
   const b = document.createElement('button');
@@ -790,43 +808,46 @@ function chip(txt, group, key, onSel){
   return b;
 }
 const svcC = document.getElementById('svcChips'), dayC = document.getElementById('dayChips'), timeC = document.getElementById('timeChips');
-SERVICES.forEach(s => svcC.appendChild(chip(s, svcC, 'svc')));
+SERVICES.forEach(sv => svcC.appendChild(chip(sv, svcC, 'svc')));
 
-const days = [];
-for (let d = new Date(), n = 0; days.length < 6; d.setDate(d.getDate() + 1)){
-  n++; if (n === 1) continue;
-  if (d.getDay() === 0) continue;
-  days.push({label: d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'}), iso: d.toISOString().slice(0,10)});
-}
-days.forEach(d => {
-  const c = chip(d.label, dayC, 'day', renderTimes);
-  c.dataset.iso = d.iso;
-  dayC.appendChild(c);
-});
-
-function isBooked(iso, time){ return bookings.some(b => b.iso === iso && b.time === time); }
 function dayISO(){ const sel = [...dayC.children].find(c => c.classList.contains('sel')); return sel ? sel.dataset.iso : null; }
-
+function isTaken(iso, t){
+  return DB.bookings.some(b => b.iso === iso && b.time === t) || (DB.blocked[iso] || []).includes(t);
+}
+/* day chips come from the LIVE diary — days Neil closes disappear for everyone */
+function buildDays(){
+  const kept = state.day; dayC.innerHTML = '';
+  for (let d = new Date(), n = 0; dayC.children.length < 6 && n < 21; d.setDate(d.getDate() + 1)){
+    n++; if (n === 1) continue;
+    if (d.getDay() === 0) continue;
+    const iso = d.toISOString().slice(0,10);
+    if (DB.closedDays.includes(iso)) continue;
+    const label = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+    const c = chip(label, dayC, 'day', renderTimes);
+    c.dataset.iso = iso;
+    if (label === kept) c.classList.add('sel');
+    dayC.appendChild(c);
+  }
+}
 function renderTimes(){
   timeC.innerHTML = ''; state.time = null;
   const iso = dayISO();
-  let seed = iso ? [...iso].reduce((a,c) => a + c.charCodeAt(0), 0) : 0;
   TIMES.forEach(t => {
     const b = chip(t, timeC, 'time');
-    seed = (seed * 9301 + 49297) % 233280;
-    const baseTaken = iso && seed / 233280 < .22;
-    if ((iso && isBooked(iso, t)) || baseTaken) b.disabled = true;
+    if (iso && isTaken(iso, t)) b.disabled = true;
     timeC.appendChild(b);
   });
 }
-renderTimes();
+buildDays(); renderTimes();
+dbGet().then(d => { DB = d; buildDays(); renderTimes(); });
 
 function step(){
   const n = state.svc ? (state.day && state.time ? 3 : 2) : 1;
   document.getElementById('wStep').textContent = 'STEP ' + n + ' / 3';
 }
 
-document.getElementById('wSubmit').onclick = () => {
+document.getElementById('wSubmit').onclick = async () => {
+  const btn = document.getElementById('wSubmit');
   const name = document.getElementById('fName').value.trim();
   const phone = document.getElementById('fPhone').value.trim();
   const reg = document.getElementById('fReg').value.trim().toUpperCase();
@@ -836,35 +857,44 @@ document.getElementById('wSubmit').onclick = () => {
   if (!state.day || !state.time) missing.push('a day & time');
   if (!name || !phone) missing.push('your name & mobile');
   if (missing.length){
-    const btn = document.getElementById('wSubmit');
     btn.textContent = 'Add ' + missing[0] + ' ↑';
     setTimeout(() => btn.textContent = 'Confirm booking →', 1800);
     return;
   }
-  const ref = 'AES-' + String(1000 + bookings.length + Math.floor(Math.random() * 90)).slice(-4);
-  const booking = {ref, svc: state.svc, day: state.day, iso: dayISO(), time: state.time, name, phone, reg, model, ts: Date.now()};
-  bookings.push(booking);
-  store.set('bookings', bookings);
+  btn.textContent = 'Confirming…';
+  const iso = dayISO(), time = state.time;
+  DB = await dbGet();                       /* fresh diary — no double-booking across devices */
+  if (isTaken(iso, time)){
+    renderTimes(); step();
+    btn.textContent = 'That slot just went — pick another ↑';
+    setTimeout(() => btn.textContent = 'Confirm booking →', 2400);
+    return;
+  }
+  const ref = 'AES-' + String(1000 + DB.bookings.length + Math.floor(Math.random() * 90)).slice(-4);
+  const booking = {ref, svc: state.svc, day: state.day, iso, time, name, phone, reg, model, ts: Date.now()};
+  DB.bookings.push(booking);
+  await dbPut(DB);
   if (BOOKING_WEBHOOK) fetch(BOOKING_WEBHOOK, {
     method: 'POST', headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({source: 'aesir-website', ...booking})
   }).catch(() => {});
   document.getElementById('doneRef').textContent = 'REF ' + ref;
-  document.getElementById('doneLine').textContent = state.day + ' · ' + state.time + ' — ' + state.svc;
+  document.getElementById('doneLine').textContent = state.day + ' · ' + time + ' — ' + state.svc;
   typeInto(document.getElementById('doneSms'),
-    'Hi ' + name.split(' ')[0] + ' — you’re booked in for ' + state.svc + ' on ' + state.day + ' at ' + state.time +
-    ' (ref ' + ref + '). We’ll text a reminder the day before. Pond Farm, UB9 6LX. Need to change it? Just reply.');
+    'Hi ' + name.split(' ')[0] + ' — you\u2019re booked in for ' + state.svc + ' on ' + state.day + ' at ' + time +
+    ' (ref ' + ref + '). We\u2019ll text a reminder the day before. Pond Farm, UB9 6LX. Need to change it? Just reply.');
   document.getElementById('wForm').style.display = 'none';
   document.getElementById('wDone').style.display = 'block';
-  toast('Slot ' + state.time + ' locked in the live diary');
+  btn.textContent = 'Confirm booking →';
+  toast('Slot ' + time + ' locked in the live diary');
 };
-document.getElementById('wAgain').onclick = () => {
+document.getElementById('wAgain').onclick = async () => {
   document.getElementById('wDone').style.display = 'none';
   document.getElementById('wForm').style.display = 'block';
   state.svc = state.day = state.time = null;
   [...document.querySelectorAll('#widget .chip')].forEach(c => c.classList.remove('sel'));
   ['fName','fPhone','fReg','fModel'].forEach(id => document.getElementById(id).value = '');
-  renderTimes(); step();
+  DB = await dbGet(); buildDays(); renderTimes(); step();
 };
 
 /* ============ WORKSHOP FEED LIGHTBOX ============ */
