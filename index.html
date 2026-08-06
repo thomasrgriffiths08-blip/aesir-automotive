@@ -152,13 +152,17 @@ video::-webkit-media-controls{display:none!important}
 .hero-ctas{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;align-items:center}
 .coords{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;color:var(--mut);text-transform:uppercase;margin-top:34px}
 .coords b{color:var(--acc)}
-.hero-strip{border-top:1px solid rgba(255,255,255,.1);margin-top:44px;background:rgba(10,11,14,.55);backdrop-filter:blur(10px)}
-.hero-strip .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
-.stat{padding:22px 18px;border-left:1px solid rgba(255,255,255,.08)}
-.stat:first-child{border-left:0;padding-left:0}
-.stat b{display:block;font-size:25px;font-weight:800;color:#fff}
-.stat b .sym{color:var(--acc)}
-.stat span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+/* the spec plate — a chassis plate riveted to the foot of the hero.
+   Lit from the upper left, like every other dimensional thing here. */
+.hero-strip{margin-top:44px;padding:0 0 26px}
+.spec{display:grid;grid-template-columns:repeat(4,1fr);padding:2px}
+.spec .cell{padding:18px 22px;border-left:1px solid rgba(255,255,255,.07)}
+.spec .cell:first-child{border-left:0}
+.spec .k{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:#6d7686;margin-bottom:7px}
+.spec .v{display:block;font-size:20px;font-weight:800;letter-spacing:-.01em;color:#f1eee0;text-transform:uppercase;line-height:1.1}
+.spec .v .sym{color:var(--acc)}
+.spec .v small{font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--mut);display:block;margin-top:3px;text-transform:none}
+@media(max-width:860px){.spec{grid-template-columns:1fr 1fr}.spec .cell:nth-child(3){border-left:0}.spec .cell:nth-child(n+3){border-top:1px solid rgba(255,255,255,.07)}}
 
 /* marquee */
 .marquee{border-block:1px solid var(--line);overflow:hidden;padding:15px 0;background:var(--bg2)}
@@ -166,32 +170,82 @@ video::-webkit-media-controls{display:none!important}
 .marquee-track b{color:var(--mut)}
 @keyframes mq{to{transform:translateX(-50%)}}
 
-/* ============ SERVICES ============ */
-.services{padding:110px 0 60px}
-.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:52px}
-.svc{background:var(--bg);padding:30px 26px 34px;position:relative;overflow:hidden;transition:background .25s;display:block}
-.svc .more{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);opacity:0;transform:translateY(4px);transition:.25s;display:inline-block;margin-top:12px}
-.svc:hover .more{opacity:1;transform:none}
-.svc:hover{background:var(--panel)}
-.svc::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--m1),var(--m2),var(--m3));transition:width .35s ease}
-.svc:hover::after{width:100%}
-.svc .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:#3c4350;letter-spacing:.2em}
-.svc h3{font-size:16.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin:12px 0 8px;color:var(--ink)}
-.svc p{font-size:13.5px;color:var(--mut)}
-.svc.feature{grid-column:span 2;background:linear-gradient(120deg,rgba(11,31,58,.9),rgba(10,11,14,.96)),url('img/v10-engine.jpg') center 30%/cover}
-.svc.feature:hover{background:linear-gradient(120deg,rgba(11,31,58,.82),rgba(10,11,14,.9)),url('img/v10-engine.jpg') center 30%/cover}
-.svc.feature .num{color:#4a5f85}
-.svc.feature h3{color:#fff;font-size:19px}
-.svc.feature p{color:#c2cbd9;font-size:14px;max-width:420px}
-.svc.feature .tag{margin-bottom:10px}
+/* ============ SERVICES — the workshop index ============
+   A numbered manual index on the right; the plate on the left is the
+   structure, not decoration. Hovering a line changes the photograph. */
+.services{padding:120px 0 80px}
+.svc-index{display:grid;grid-template-columns:1fr 1.02fr;gap:70px;align-items:start}
+.svc-stage{position:sticky;top:108px;aspect-ratio:4/5;overflow:hidden;background:var(--panel);border:1px solid var(--line)}
+.svc-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.9);
+  opacity:0;transform:scale(1.07);transition:opacity .8s ease,transform 1.6s cubic-bezier(.2,.7,.2,1)}
+.svc-stage img.on{opacity:1;transform:none}
+.svc-stage .veil-b{position:absolute;inset:auto 0 0 0;height:52%;background:linear-gradient(transparent,rgba(8,9,12,.9));pointer-events:none}
+.svc-stage figcaption{position:absolute;left:22px;right:22px;bottom:20px;display:flex;gap:12px;align-items:baseline;z-index:2}
+.svc-stage figcaption .n{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--acc)}
+.svc-stage figcaption .t{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#cfd6e2}
+.svc-stage .corner{position:absolute;width:14px;height:14px;border:1px solid rgba(255,255,255,.4);z-index:2}
+.svc-stage .corner.tl{top:14px;left:14px;border-right:0;border-bottom:0}
+.svc-stage .corner.br{bottom:14px;right:14px;border-left:0;border-top:0}
 
-/* ============ WORKSHOP FEED (their real photos) ============ */
-.feed{padding:60px 0 110px}
+.svc-rows{border-top:1px solid var(--line)}
+.svc-row{display:block;position:relative;padding:20px 40px 20px 62px;border-bottom:1px solid var(--line);transition:background .3s}
+.svc-row .n{position:absolute;left:20px;top:22px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--dim);transition:color .3s}
+.svc-row h3{font-size:clamp(17px,1.5vw,21px);font-weight:800;text-transform:uppercase;letter-spacing:-.005em;color:var(--mut);transition:color .3s,transform .45s cubic-bezier(.2,.7,.2,1)}
+.svc-row p{font-size:13.5px;line-height:1.6;color:var(--dim);max-width:44ch;
+  max-height:0;opacity:0;overflow:hidden;transition:max-height .5s cubic-bezier(.2,.7,.2,1),opacity .35s,margin .5s}
+.svc-row .arrow{position:absolute;right:6px;top:21px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--acc);opacity:0;transform:translateX(-6px);transition:.3s}
+.svc-row::before{content:"";position:absolute;left:0;top:-1px;bottom:-1px;width:2px;background:var(--acc);transform:scaleY(0);transform-origin:top;transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.svc-row.on{background:linear-gradient(90deg,rgba(232,68,58,.05),transparent 60%)}
+.svc-row.on::before{transform:scaleY(1)}
+.svc-row.on .n{color:var(--acc)}
+.svc-row.on h3{color:var(--ink);transform:translateX(4px)}
+.svc-row.on p{max-height:120px;opacity:1;margin-top:9px}
+.svc-row.on .arrow{opacity:1;transform:none}
+.svc-thumb{display:none}
+@media(max-width:900px){
+  .svc-index{grid-template-columns:1fr;gap:0}
+  .svc-stage{display:none}
+  .svc-row{padding:18px 34px 18px 0;display:grid;grid-template-columns:74px 1fr;gap:18px;align-items:start}
+  /* the number rides the corner of the thumb like a plate, rather than
+     floating loose beside the description */
+  .svc-row .n{position:absolute;left:0;top:18px;z-index:2;background:rgba(8,9,12,.82);padding:3px 6px;font-size:9.5px;color:var(--acc)}
+  .svc-row h3,.svc-row p{grid-column:2;min-width:0}  /* grid items default to min-width:auto and would overflow */
+  .svc-row p{max-height:none;opacity:1;margin-top:8px;color:var(--mut);max-width:none}
+  .svc-row .arrow{opacity:1;transform:none;top:18px}
+  .svc-thumb{display:block;grid-column:1;grid-row:1/span 2;width:74px;height:74px;object-fit:cover;filter:saturate(.9);border:1px solid var(--line)}
+}
+
+/* ============ THE WORK — editorial photo essay ============
+   Asymmetric plates at deliberately different scales, captions set in
+   the margin the way a printed picture story would run them. */
+.feed{padding:20px 0 120px}
 .feed-head{display:flex;justify-content:space-between;align-items:end;gap:30px;flex-wrap:wrap}
-.feed-head .ig{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--mut);border:1px solid var(--line);padding:10px 18px;transition:.2s}
+.feed-head .ig{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;color:var(--mut);border:1px solid var(--line);padding:10px 18px;transition:.2s}
 .feed-head .ig:hover{color:var(--acc);border-color:var(--acc)}
-.feed-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:190px;gap:12px;margin-top:46px}
-/* .shot tile styles live in css/site.css — shared with the gallery */
+.essay{margin-top:54px;display:flex;flex-direction:column;gap:22px}
+.pl-img{position:relative;overflow:hidden;background:var(--panel);display:block}
+.pl-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.9);transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.pl-img:hover img{transform:scale(1.035)}
+/* row 1 — the opening plate, caption set in the margin beside it */
+.row-open{display:grid;grid-template-columns:1.72fr 1fr;gap:26px;align-items:end}
+.row-open .pl-img{height:clamp(320px,44vw,560px)}
+.row-open .side{padding-bottom:6px}
+.row-open .side .pull{margin-bottom:26px}
+/* row 2 — unequal pair */
+.row-pair{display:grid;grid-template-columns:1.55fr 1fr;gap:22px;align-items:start}
+.row-pair .pl-img{height:clamp(230px,26vw,340px)}
+.row-pair.flip{grid-template-columns:1fr 1.55fr}
+/* row 3 — the wide plate, breaking out past the text column */
+.row-wide .pl-img{height:clamp(260px,34vw,460px)}
+/* row 4 — three at a smaller register */
+.row-three{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.row-three .pl-img{height:clamp(200px,20vw,280px)}
+@media(max-width:860px){
+  .row-open,.row-pair,.row-pair.flip{grid-template-columns:1fr;gap:18px}
+  .row-open .pl-img{height:300px}
+  .row-three{grid-template-columns:1fr 1fr;gap:16px}
+  .row-three .pl-img{height:180px}
+}
 
 /* ============ SYSTEMS ============ */
 .systems{padding:110px 0;background:
@@ -215,6 +269,9 @@ video::-webkit-media-controls{display:none!important}
 .bp .ic{width:40px;height:40px;flex:none;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;color:var(--acc);font-size:13px;background:var(--bg2)}
 .bp b{display:block;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
 .bp span{font-size:13.5px;color:var(--mut)}
+.book-plate{margin-top:40px}
+.book-plate img{width:100%;height:210px;object-fit:cover;filter:saturate(.9)}
+@media(max-width:960px){.book-plate{display:none}}
 .widget{background:var(--panel);border:1px solid var(--line);padding:34px;position:relative;box-shadow:0 40px 80px -40px rgba(0,0,0,.8)}
 .widget::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--m1),var(--m2),var(--m3))}
 .w-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -243,28 +300,38 @@ video::-webkit-media-controls{display:none!important}
 .themes{display:flex;gap:9px;flex-wrap:wrap;margin-top:30px}
 .theme{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;background:var(--panel);border:1px solid var(--line);padding:7px 13px;color:var(--mut)}
 .theme b{color:var(--acc)}
-.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}
-.review{background:var(--panel);border:1px solid var(--line);padding:28px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden}
-.review::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--m1),var(--m2),var(--m3));transition:width .35s}
-.review:hover::after{width:100%}
-.review .stars{font-size:14px}
-.review p{font-size:14.5px;color:var(--mut);flex:1}
-.review .who{display:flex;align-items:center;gap:12px}
-.review .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
-.review .who b{display:block;font-size:13.5px;color:var(--ink)}
-.review .who span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim)}
+/* reviews set as type, not stacked in cards */
+.rev-top{display:grid;grid-template-columns:1fr auto;gap:60px;align-items:start}
+.rev-lead p{font-size:clamp(23px,2.9vw,38px);font-weight:800;line-height:1.24;letter-spacing:-.015em;color:var(--ink);max-width:22ch}
+.rev-lead .mark{color:var(--acc)}
+.rev-lead cite{display:block;margin-top:20px;font-style:normal;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.rev-score{text-align:right;flex:none;padding-top:6px}
+.rev-score .big{display:block;font-size:76px;font-weight:900;line-height:.9;color:var(--ink);letter-spacing:-.03em}
+.rev-score .stars{display:block;font-size:16px;color:var(--gold);letter-spacing:3px;margin-top:10px}
+.rev-score .lbl{display:block;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);line-height:1.8}
+.rev-list{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:64px;padding-top:40px;border-top:1px solid var(--line)}
+.rev-item p{font-size:16px;line-height:1.62;color:var(--mut)}
+.rev-item cite{display:block;margin-top:16px;font-style:normal;font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.rev-item cite span{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--dim);font-weight:400;margin-top:4px;text-transform:uppercase}
+.rev-foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;margin-top:52px}
+.rev-foot .ig{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;color:var(--mut);border:1px solid var(--line);padding:11px 20px;transition:.2s}
+.rev-foot .ig:hover{color:var(--acc);border-color:var(--acc)}
+@media(max-width:860px){
+  .rev-top{grid-template-columns:1fr;gap:34px}
+  .rev-score{text-align:left}
+  .rev-list{grid-template-columns:1fr;gap:38px}
+}
 
 /* ============ ABOUT ============ */
-.about{padding:110px 0}
-.about-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:70px;align-items:center}
+.about{padding:120px 0}
+.about-grid{display:grid;grid-template-columns:.94fr 1.06fr;gap:74px;align-items:center}
 .about-img{position:relative}
-.about-img img{filter:saturate(.9);border:1px solid var(--line);width:100%;max-height:560px;object-fit:cover}
-.about-img::after{content:"";position:absolute;right:-14px;bottom:-14px;width:60%;height:60%;border:2px solid var(--blue-d);z-index:-1}
-.about-img .plate{position:absolute;left:-14px;top:22px;background:#000c;border:1px solid var(--line);backdrop-filter:blur(6px);color:#fff;padding:12px 18px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase}
+.about-img img{filter:saturate(.9);width:100%;height:clamp(380px,46vw,620px);object-fit:cover}
+.about-img .plate{position:absolute;left:0;bottom:0;background:rgba(8,9,12,.88);backdrop-filter:blur(6px);color:#fff;padding:13px 20px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
 .about-img .plate b{color:var(--acc)}
-.about p{color:var(--mut);margin-top:18px;font-size:15.5px}
+.about p{color:var(--mut);margin-top:20px;font-size:16px;max-width:52ch}
 .about p b{color:var(--ink)}
-.quoteline{border-left:3px solid var(--blue-d);padding:6px 0 6px 20px;margin-top:24px;font-size:15px;color:var(--ink);font-weight:600}
+.quoteline{border-left:2px solid var(--acc);padding:4px 0 4px 22px;margin-top:30px;font-size:17px;line-height:1.5;color:var(--ink);font-weight:700;max-width:44ch}
 .quoteline small{display:block;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--dim);font-weight:400;letter-spacing:.14em;margin-top:6px}
 
 section.has-gw{overflow:hidden}
@@ -375,10 +442,12 @@ section.has-gw{overflow:hidden}
   </div>
   <div class="hero-strip veil">
     <div class="wrap">
-      <div class="stat"><b>5.0<span class="sym">★</span></b><span>Google rating</span></div>
-      <div class="stat"><b>20<span class="sym">+</span></b><span>Five-star reviews</span></div>
-      <div class="stat"><b>Engine <span class="sym">rebuilds</span></b><span>Done in-house</span></div>
-      <div class="stat"><b>24<span class="sym">/7</span></b><span>Online booking</span></div>
+      <div class="spec plate-metal">
+        <div class="cell"><span class="k">Rating</span><span class="v">5.0<span class="sym">★</span><small>20 Google reviews</small></span></div>
+        <div class="cell"><span class="k">Established</span><span class="v">2020<small>Co. 12705996</small></span></div>
+        <div class="cell"><span class="k">Speciality</span><span class="v">Engine<small>Rebuilt in-house</small></span></div>
+        <div class="cell"><span class="k">Works</span><span class="v">Mon–Fri<small>8am — 6pm · UB9 6LX</small></span></div>
+      </div>
     </div>
   </div>
 </header>
@@ -394,26 +463,72 @@ section.has-gw{overflow:hidden}
 <section class="services has-gw" id="services">
   <span class="ghostword" aria-hidden="true">Services</span>
   <div class="wrap">
-    <div class="rv">
-      <div class="kicker">What we do</div>
-      <h2>Everything your car needs.<br><span class="ghost">Nothing it doesn't.</span></h2>
-      <p class="lead">Every job starts with a proper diagnosis and ends with clear photos and a straight explanation — the thing our reviews mention most.</p>
+    <div class="sec-head rv">
+      <div class="sec-meta"><span class="sec-n">§ 01</span><span class="sec-label">What we do</span><span class="sec-note">Nine disciplines · one pair of hands</span></div>
+      <h2>Everything your car needs.</h2>
+      <p class="lead">Every job starts with a proper diagnosis and ends with photographs and a straight explanation — the thing the reviews mention most.</p>
     </div>
-    <div class="svc-grid">
-      <a class="svc feature rv" data-cursor="OPEN" href="services/engine-rebuilds.html">
-        <span class="tag">The specialty</span>
-        <h3>Engine rebuilds &amp; machining</h3>
-        <p>Bottom ends, bearings, skimmed heads, full rebuilds — done on the bench in our workshop, not sent away. From M V10s to classic straight-sixes.</p>
-        <span class="more">Read more →</span>
-      </a>
-      <a class="svc rv" data-cursor="OPEN" href="services/servicing.html"><span class="num">02</span><h3>Servicing &amp; Oil</h3><p>Manufacturer-schedule servicing, genuine or OEM parts, digital history updated.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" data-cursor="OPEN" href="services/diagnostics.html"><span class="num">03</span><h3>Engine Diagnostics</h3><p>Dealer-level kit. We find the fault, not just the code — evidence before any work.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" data-cursor="OPEN" href="services/brakes-suspension.html"><span class="num">04</span><h3>Brakes &amp; Suspension</h3><p>Pads, discs, calipers, bushes, dampers. Torqued to spec and road-tested.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" data-cursor="OPEN" href="services/electrical-coding.html"><span class="num">05</span><h3>Electrical &amp; Coding</h3><p>Faults traced properly — batteries registered, modules coded, lights out for good.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" data-cursor="OPEN" href="services/air-conditioning.html"><span class="num">06</span><h3>Air Conditioning</h3><p>Re-gas, leak detection, cabin filters. Cold again before summer hits.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" data-cursor="OPEN" href="services/classics-restoration.html"><span class="num">07</span><h3>Classics &amp; Restoration</h3><p>Late-20th-century BMWs are the house passion. Sympathetic work, period-correct parts.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" data-cursor="OPEN" href="services/pre-purchase-inspections.html"><span class="num">08</span><h3>Pre-Purchase Inspections</h3><p>We inspect it like we'd have to fix it. Full written report before you commit.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" data-cursor="OPEN" href="services/mot-prep.html"><span class="num">09</span><h3>MOT Prep &amp; Repairs</h3><p>Pre-MOT checks and repairs — with automatic reminders so you never miss a date.</p><span class="more">Read more →</span></a>
+    <div class="svc-index">
+      <figure class="svc-stage rv" id="svcStage" aria-hidden="true">
+        <img src="img/bearings.jpg" alt="" class="on" data-i="0">
+        <img src="img/e30-bay.jpg" alt="" data-i="1">
+        <img src="img/f430.jpg" alt="" data-i="2">
+        <img src="img/workshop.jpg" alt="" data-i="3">
+        <img src="img/i8.jpg" alt="" data-i="4">
+        <img src="img/z3-workshop.jpg" alt="" data-i="5">
+        <img src="img/m20-head.jpg" alt="" data-i="6">
+        <img src="img/z3-sunset.jpg" alt="" data-i="7">
+        <img src="img/s50-block.jpg" alt="" data-i="8">
+        <span class="veil-b"></span><span class="corner tl"></span><span class="corner br"></span>
+        <figcaption><span class="n">FIG. 01</span><span class="t" id="svcCap">S85 V10 — big-end shells</span></figcaption>
+      </figure>
+      <div class="svc-rows rv">
+        <a class="svc-row on" href="services/engine-rebuilds.html" data-i="0" data-cap="S85 V10 — big-end shells">
+          <img class="svc-thumb" src="img/bearings.jpg" alt="" loading="lazy"><span class="n">01</span>
+          <h3>Engine rebuilds &amp; machining</h3>
+          <p>Bottom ends, bearings, skimmed heads, full rebuilds — on the bench here, not sent away. M V10s to classic straight-sixes.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/servicing.html" data-i="1" data-cap="E30 — M20 service, bay out">
+          <img class="svc-thumb" src="img/e30-bay.jpg" alt="" loading="lazy"><span class="n">02</span>
+          <h3>Servicing &amp; oil</h3>
+          <p>Manufacturer-schedule servicing, genuine or OEM parts, digital service history updated exactly as a dealer would.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/diagnostics.html" data-i="2" data-cap="F430 — misfire diagnosis">
+          <img class="svc-thumb" src="img/f430.jpg" alt="" loading="lazy"><span class="n">03</span>
+          <h3>Engine diagnostics</h3>
+          <p>Dealer-level equipment. We find the fault, not just the code — and you see the evidence before any work is agreed.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/brakes-suspension.html" data-i="3" data-cap="Pond Farm — three ramps">
+          <img class="svc-thumb" src="img/workshop.jpg" alt="" loading="lazy"><span class="n">04</span>
+          <h3>Brakes &amp; suspension</h3>
+          <p>Pads, discs, calipers, bushes, dampers — torqued to specification and road-tested before it goes back to you.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/electrical-coding.html" data-i="4" data-cap="i8 — hybrid electrics">
+          <img class="svc-thumb" src="img/i8.jpg" alt="" loading="lazy"><span class="n">05</span>
+          <h3>Electrical &amp; coding</h3>
+          <p>Faults traced to the wire. Batteries registered, modules coded, warning lights out for good rather than reset.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/air-conditioning.html" data-i="5" data-cap="Z3 M Coupé on the ramp">
+          <img class="svc-thumb" src="img/z3-workshop.jpg" alt="" loading="lazy"><span class="n">06</span>
+          <h3>Air conditioning</h3>
+          <p>Re-gas, leak detection and cabin filters — sorted properly, and before the first warm week of the year.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/classics-restoration.html" data-i="6" data-cap="M20 — head rebuilt">
+          <img class="svc-thumb" src="img/m20-head.jpg" alt="" loading="lazy"><span class="n">07</span>
+          <h3>Classics &amp; restoration</h3>
+          <p>Late-20th-century BMWs are the house passion. Sympathetic work, period-correct parts, honest advice on both.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/pre-purchase-inspections.html" data-i="7" data-cap="Road-tested at last light">
+          <img class="svc-thumb" src="img/z3-sunset.jpg" alt="" loading="lazy"><span class="n">08</span>
+          <h3>Pre-purchase inspections</h3>
+          <p>We inspect it like we'd be the ones fixing it. Full written report and photographs before you commit a penny.</p><span class="arrow">→</span>
+        </a>
+        <a class="svc-row" href="services/mot-prep.html" data-i="8" data-cap="S50 block — decked &amp; honed">
+          <img class="svc-thumb" src="img/s50-block.jpg" alt="" loading="lazy"><span class="n">09</span>
+          <h3>MOT prep &amp; repairs</h3>
+          <p>Pre-MOT checks and the repairs that follow, so the test itself is a formality rather than a gamble.</p><span class="arrow">→</span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -422,24 +537,69 @@ section.has-gw{overflow:hidden}
 <section class="feed has-gw" id="feed">
   <span class="ghostword" aria-hidden="true">The Work</span>
   <div class="wrap">
-    <div class="feed-head rv">
-      <div>
-        <div class="kicker">Straight off the bench</div>
-        <h2>Real work. <em>Real cars.</em></h2>
+    <div class="sec-head rv" style="margin-bottom:0">
+      <div class="sec-meta"><span class="sec-n">§ 02</span><span class="sec-label">Straight off the bench</span><span class="sec-note">Photographed as it happened</span></div>
+      <div class="feed-head">
+        <h2>Real work.<br>Real cars.</h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="ig" href="gallery.html">FULL GALLERY →</a><a class="ig" href="https://www.instagram.com/aesir.automotive/" target="_blank" rel="noopener">@AESIR.AUTOMOTIVE</a></div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="ig" href="gallery.html">FULL GALLERY →</a><a class="ig" href="https://www.instagram.com/aesir.automotive/" target="_blank" rel="noopener">@AESIR.AUTOMOTIVE</a></div>
     </div>
-    <div class="feed-grid">
-      <div class="shot tall rv" data-cursor="VIEW"><img src="img/z3-workshop.jpg" alt="Z3 M Coupé on the ramp, S50 engine out"><span class="cap"><b>Z3 M COUPÉ</b> · S50B32 fired straight up</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/v10-engine.jpg" alt="BMW S85 V10 engine bay" style="object-position:center 42%"><span class="cap"><b>E60 M5 TOURING</b> · S85 V10</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/s50-block.jpg" alt="BMW straight-six block freshly machined, Ferrari F430 behind"><span class="cap"><b>S50 STRAIGHT-SIX</b> · block back from machining</span></div>
-      <div class="shot tall rv" data-cursor="VIEW"><img src="img/f430.jpg" alt="Ferrari F430 in the workshop"><span class="cap"><b>FERRARI F430</b> · multiple misfires</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/bearings.jpg" alt="E60 M5 big end bearings"><span class="cap"><b>E60 M5</b> · big ends — close shave</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/m20-head.jpg" alt="BMW M20 cylinder head"><span class="cap"><b>M20 STRAIGHT-SIX</b> · head rebuild</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/e30-bay.jpg" alt="Classic BMW E30 M20 engine bay" style="object-position:center 45%"><span class="cap"><b>E30 CLASSIC</b> · "oh dear, M20B25 feeling the heat"</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/i8.jpg" alt="BMW i8" style="object-position:center 45%"><span class="cap"><b>BMW i8</b> · "what a car!!!!"</span></div>
-      <div class="shot wide rv" data-cursor="VIEW"><img src="img/z3-sunset.jpg" alt="Z3 M road test at sunset" style="object-position:center 55%"><span class="cap"><b>TESTED &amp; READY</b> · "see you in 600 miles yeah?!"</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/ferrari-classic.jpg" alt="Classic Ferrari" style="object-position:center 55%"><span class="cap"><b>75 YEARS OF FERRARI</b> · Silverstone Classic</span></div>
+
+    <div class="essay">
+      <!-- opening plate: the engine out, caption set in the margin -->
+      <div class="row-open rv">
+        <a class="pl-img" href="gallery.html"><img src="img/z3-workshop.jpg" alt="Z3 M Coupé on the ramp with its S50 straight-six out on the floor"></a>
+        <div class="side">
+          <p class="pull">An engine out of the car is the <span class="mark">honest</span> photograph. Most garages never take it.</p>
+          <div class="fig"><span class="n">FIG. 01</span><span class="t"><b>Z3 M Coupé</b> — S50B32 stripped, rebuilt and refitted at Pond Farm. Fired straight up, ran sweet from the get go.</span></div>
+        </div>
+      </div>
+
+      <!-- unequal pair -->
+      <div class="row-pair rv">
+        <div>
+          <a class="pl-img" href="gallery.html"><img src="img/bearings.jpg" alt="Twenty S85 V10 big-end bearing shells laid out in firing order" style="object-position:center 40%"></a>
+          <div class="fig"><span class="n">FIG. 02</span><span class="t"><b>E60 M5</b> — every big-end shell out of the V10, laid out in order. The bronze on the right-hand set is the overlay running out, caught before it scored the crank.</span></div>
+        </div>
+        <div>
+          <a class="pl-img" href="gallery.html"><img src="img/v10-engine.jpg" alt="BMW S85 V10 in the engine bay" style="object-position:center 42%"></a>
+          <div class="fig"><span class="n">FIG. 03</span><span class="t"><b>S85 V10</b> — BMW's F1-derived ten, in the bay before the strip.</span></div>
+        </div>
+      </div>
+
+      <!-- the wide plate -->
+      <div class="row-wide rv">
+        <a class="pl-img" href="gallery.html"><img src="img/f430.jpg" alt="Ferrari F430 Spider inside the Æsir workshop" style="object-position:center 62%"></a>
+        <div class="fig"><span class="n">FIG. 04</span><span class="t"><b>Ferrari F430</b> — in for misfires three other garages couldn't trace. Diagnosed, fixed, returned. Proper diagnosis doesn't care about the badge.</span></div>
+      </div>
+
+      <!-- pair, flipped weight -->
+      <div class="row-pair flip rv">
+        <div>
+          <a class="pl-img" href="gallery.html"><img src="img/m20-head.jpg" alt="BMW M20 cylinder head rebuilt on the bench"></a>
+          <div class="fig"><span class="n">FIG. 05</span><span class="t"><b>M20 straight-six</b> — head skimmed and rebuilt.</span></div>
+        </div>
+        <div>
+          <a class="pl-img" href="gallery.html"><img src="img/workshop.jpg" alt="Inside the Pond Farm workshop — two-post lifts and tool wall" style="object-position:center 55%"></a>
+          <div class="fig"><span class="n">FIG. 06</span><span class="t"><b>Pond Farm</b> — three ramps, a blast cabinet and a press. The floor all of the above was rebuilt on.</span></div>
+        </div>
+      </div>
+
+      <!-- closing three, smaller register -->
+      <div class="row-three rv">
+        <div>
+          <a class="pl-img" href="gallery.html"><img src="img/s50-block.jpg" alt="Freshly machined straight-six block"></a>
+          <div class="fig"><span class="n">FIG. 07</span><span class="t"><b>Block</b> — decked flat, bores honed.</span></div>
+        </div>
+        <div>
+          <a class="pl-img" href="gallery.html"><img src="img/i8.jpg" alt="BMW i8 at the pumps" style="object-position:center 45%"></a>
+          <div class="fig"><span class="n">FIG. 08</span><span class="t"><b>i8</b> — "what a car!!!!"</span></div>
+        </div>
+        <div>
+          <a class="pl-img" href="gallery.html"><img src="img/z3-sunset.jpg" alt="M Power engine cover at sunset after a road test" style="object-position:center 45%"></a>
+          <div class="fig"><span class="n">FIG. 09</span><span class="t"><b>Road-tested</b> — "see you in 600 miles yeah?!"</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -448,8 +608,8 @@ section.has-gw{overflow:hidden}
 <section class="booking has-gw" id="book">
   <span class="ghostword" aria-hidden="true">Book It</span>
   <div class="wrap">
-    <div class="rv">
-      <div class="kicker">Book online · 24/7</div>
+    <div class="sec-head rv" style="margin-bottom:36px">
+      <div class="sec-meta"><span class="sec-n">§ 05</span><span class="sec-label">Book online · 24/7</span><span class="sec-note">Live diary · no double-booking</span></div>
       <h2>Booked in under <em>60 seconds.</em></h2>
     </div>
     <div class="book-grid">
@@ -459,6 +619,10 @@ section.has-gw{overflow:hidden}
           <div class="bp"><span class="ic">01</span><div><b>Choose your service</b><span>Not sure what's wrong? Pick diagnostics and describe it.</span></div></div>
           <div class="bp"><span class="ic">02</span><div><b>Pick a real slot</b><span>Live availability — no "we'll call you back".</span></div></div>
           <div class="bp"><span class="ic">03</span><div><b>Confirmed instantly</b><span>Booking reference + SMS confirmation + day-before reminder.</span></div></div>
+        </div>
+        <div class="book-plate">
+          <img src="img/e30-bay.jpg" alt="Classic BMW engine bay in for a service at Pond Farm" loading="lazy">
+          <div class="fig"><span class="n">FIG. 10</span><span class="t">Where it ends up — <b>the bench at Pond Farm</b>, not a queue in a call centre.</span></div>
         </div>
       </div>
       <div class="widget rv" id="widget">
@@ -503,42 +667,38 @@ section.has-gw{overflow:hidden}
 <section class="reviews has-gw" id="reviews">
   <span class="ghostword" aria-hidden="true">Five Stars</span>
   <div class="wrap">
-    <div class="rev-head rv">
-      <div>
-        <div class="kicker">Word of mouth</div>
-        <h2>Real reviews.<br><em>Straight off Google.</em></h2>
-        <div class="themes">
-          <span class="theme"><b>×5</b> knowledgeable</span>
-          <span class="theme"><b>×3</b> communication</span>
-          <span class="theme"><b>×2</b> clear explanations</span>
-          <span class="theme"><b>×2</b> transparency</span>
-          <a class="theme" href="reviews.html" style="color:var(--acc)">ALL REVIEWS →</a>
-        </div>
-      </div>
-      <div class="score">
-        <span class="big">5.0</span>
-        <div class="meta">
-          <div class="stars">★★★★★</div>
-          <span>20 GOOGLE REVIEWS</span>
+    <div class="sec-head rv">
+      <div class="sec-meta"><span class="sec-n">§ 03</span><span class="sec-label">Word of mouth</span><span class="sec-note">20 reviews · not one below five</span></div>
+      <div class="rev-top">
+        <blockquote class="rev-lead">
+          <p>“Neil was highly knowledgeable and took the time to <span class="mark">clearly explain</span> the issues with my vehicle. The customer service throughout was outstanding.”</p>
+          <cite>Arun · Google review · 5 months ago</cite>
+        </blockquote>
+        <div class="rev-score">
+          <span class="big">5.0</span>
+          <span class="stars">★★★★★</span>
+          <span class="lbl">Average of 20<br>Google reviews</span>
         </div>
       </div>
     </div>
-    <div class="rev-grid">
-      <div class="review rv">
-        <span class="stars">★★★★★</span>
-        <p>"The garage was recommended to me by a friend, and it proved to be an excellent choice for BMW servicing. Neil was highly knowledgeable and took the time to clearly explain the issues with my vehicle. The customer service throughout was outstanding."</p>
-        <div class="who"><span class="av" style="background:#0066b1">A</span><div><b>Arun</b><span>GOOGLE REVIEW · 5 MONTHS AGO</span></div></div>
+    <div class="rev-list rv">
+      <div class="rev-item">
+        <p>“I had a really great experience with Neil the mechanic. He was incredibly knowledgeable. He picked up on all the faults with my car quickly and explained everything clearly.”</p>
+        <cite>Yasmeen<span>Google review</span></cite>
       </div>
-      <div class="review rv">
-        <span class="stars">★★★★★</span>
-        <p>"I had a really great experience with Neil the mechanic. He was incredibly knowledgeable. He picked up on all the faults with my car quickly and explained everything clearly."</p>
-        <div class="who"><span class="av" style="background:#0a86c8">Y</span><div><b>Yasmeen</b><span>GOOGLE REVIEW · 5 MONTHS AGO</span></div></div>
+      <div class="rev-item">
+        <p>“I was recommended to Neil by another garage that couldn't economically fix my BMW 320i. The service was professional, fairly priced, and completed to a high standard.”</p>
+        <cite>Jagdeep<span>Google review</span></cite>
       </div>
-      <div class="review rv">
-        <span class="stars">★★★★★</span>
-        <p>"The service was professional, fairly priced, and completed to a high standard."</p>
-        <div class="who"><span class="av" style="background:#e7222e">M</span><div><b>Google reviewer</b><span>GOOGLE REVIEW</span></div></div>
+    </div>
+    <div class="rev-foot rv">
+      <div class="themes">
+        <span class="theme"><b>×5</b> knowledgeable</span>
+        <span class="theme"><b>×3</b> communication</span>
+        <span class="theme"><b>×2</b> clear explanations</span>
+        <span class="theme"><b>×2</b> transparency</span>
       </div>
+      <a class="ig" href="reviews.html">READ ALL 20 →</a>
     </div>
   </div>
 </section>
@@ -551,8 +711,8 @@ section.has-gw{overflow:hidden}
       <span class="plate">THE WORKSHOP · <b>3 RAMPS</b> · POND FARM</span>
     </div>
     <div class="rv">
-      <div class="kicker">The workshop</div>
-      <h2>One pair of hands.<br><span class="ghost">Every job.</span></h2>
+      <div class="sec-meta" style="margin-bottom:22px"><span class="sec-n">§ 04</span><span class="sec-label">The workshop</span></div>
+      <h2>One pair<br>of hands.</h2>
       <p><b>Æsir Automotive</b> is run by <b>Neil Haddow</b> from Pond Farm, on the green edge of Uxbridge. No service desk, no upsell scripts — the person you speak to is the person under your bonnet.</p>
       <p>The passion here is <b>late-20th-century classics</b> and proper engineering: engines rebuilt on the bench, heads machined, faults traced to the wire. It's why other garages send their difficult BMWs this way — and why Ferraris and a Rolls-Royce Ghost have found their way onto the ramps.</p>
       <div class="quoteline">"I was recommended to Neil by another garage that couldn't economically fix my BMW 320i."
@@ -567,8 +727,8 @@ section.has-gw{overflow:hidden}
 <section class="faq has-gw" id="faq">
   <span class="ghostword" aria-hidden="true">Asked</span>
   <div class="wrap">
-    <div class="rv">
-      <div class="kicker">Straight answers</div>
+    <div class="sec-head rv" style="margin-bottom:0">
+      <div class="sec-meta"><span class="sec-n">§ 06</span><span class="sec-label">Straight answers</span><span class="sec-note">More on the FAQ page</span></div>
       <h2>Asked all the time.</h2>
     </div>
     <div class="faq-list rv">
@@ -604,8 +764,8 @@ section.has-gw{overflow:hidden}
 <!-- ============ CONTACT ============ -->
 <section class="contact" id="contact">
   <div class="wrap">
-    <div class="rv">
-      <div class="kicker">Find the workshop</div>
+    <div class="sec-head rv" style="margin-bottom:0">
+      <div class="sec-meta"><span class="sec-n">§ 07</span><span class="sec-label">Find the workshop</span><span class="sec-note">Mon–Fri · 8am — 6pm</span></div>
       <h2>Pond Farm, <em>Uxbridge.</em></h2>
     </div>
     <div class="c-grid">
@@ -654,14 +814,6 @@ section.has-gw{overflow:hidden}
 <div class="mobar">
   <a class="btn ghost" href="tel:07956658177">✆ Call</a>
   <a class="btn" href="#book">Book online</a>
-</div>
-
-<div class="lb" id="lb" role="dialog" aria-label="Photo viewer">
-  <button class="lb-x" aria-label="Close">✕</button>
-  <button class="lb-nav lb-prev" aria-label="Previous">←</button>
-  <img id="lbImg" alt="">
-  <div class="lb-cap" id="lbCap"></div>
-  <button class="lb-nav lb-next" aria-label="Next">→</button>
 </div>
 
 <script src="js/shared.js"></script>
@@ -849,28 +1001,28 @@ document.getElementById('wAgain').onclick = async () => {
   DB = await dbGet(); buildDays(); renderTimes(); step();
 };
 
-/* ============ WORKSHOP FEED LIGHTBOX ============ */
+/* ============ SERVICES INDEX ============
+   Pointing at a line changes the plate. Keyboard focus does the same, so
+   tabbing through the index tells the same story as the mouse. */
 (() => {
-  const shots = [...document.querySelectorAll('.feed-grid .shot')];
-  const lb = document.getElementById('lb'), img = document.getElementById('lbImg'), cap = document.getElementById('lbCap');
-  let cur = 0;
-  function show(i){
-    cur = (i + shots.length) % shots.length;
-    img.src = shots[cur].querySelector('img').src;
-    cap.innerHTML = shots[cur].querySelector('.cap').innerHTML;
+  const rows = [...document.querySelectorAll('.svc-row')];
+  const plates = [...document.querySelectorAll('#svcStage img')];
+  const cap = document.getElementById('svcCap');
+  if (!rows.length || !plates.length) return;
+  const figN = document.querySelector('#svcStage .n');
+  let cur = 0, raf = 0;
+  function select(i){
+    if (i === cur) return;
+    cur = i;
+    rows.forEach((r, n) => r.classList.toggle('on', n === i));
+    plates.forEach((p, n) => p.classList.toggle('on', n === i));
+    cap.textContent = rows[i].dataset.cap;
+    figN.textContent = 'FIG. ' + String(i + 1).padStart(2, '0');
   }
-  function open(i){ show(i); lb.classList.add('open'); }
-  function close(){ lb.classList.remove('open'); }
-  shots.forEach((s, i) => { s.style.cursor = 'pointer'; s.addEventListener('click', () => open(i)); });
-  lb.querySelector('.lb-x').onclick = close;
-  lb.querySelector('.lb-prev').onclick = e => { e.stopPropagation(); show(cur - 1); };
-  lb.querySelector('.lb-next').onclick = e => { e.stopPropagation(); show(cur + 1); };
-  lb.addEventListener('click', e => { if (e.target === lb) close(); });
-  addEventListener('keydown', e => {
-    if (!lb.classList.contains('open')) return;
-    if (e.key === 'Escape') close();
-    if (e.key === 'ArrowRight') show(cur + 1);
-    if (e.key === 'ArrowLeft') show(cur - 1);
+  rows.forEach((r, i) => {
+    const pick = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => select(i)); };
+    r.addEventListener('pointerenter', pick);
+    r.addEventListener('focus', pick);
   });
 })();
 </script>
