@@ -185,3 +185,66 @@ footer.site{padding:40px 0;border-top:1px solid var(--line);background:var(--bg2
   body{padding-bottom:64px}
   .stat-row{grid-template-columns:1fr 1fr}
 }
+
+/* ============ AWARD LAYER ============ */
+/* page entry fade */
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+body{animation:pageIn .55s ease}
+
+/* nav tucks away on scroll down, returns on scroll up */
+nav.site{transition:border-color .3s,background .3s,transform .45s cubic-bezier(.2,.7,.2,1)}
+nav.site.tuck{transform:translateY(-102%)}
+
+/* custom cursor (fine pointers only) */
+@media (pointer:fine){
+  .cur,.cur-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:4000;border-radius:50%;will-change:transform}
+  .cur{width:6px;height:6px;background:var(--sky);margin:-3px 0 0 -3px}
+  .cur-ring{width:36px;height:36px;margin:-18px 0 0 -18px;border:1.5px solid rgba(0,160,224,.55);display:flex;align-items:center;justify-content:center;
+    transition:width .25s,height .25s,margin .25s,background .25s,border-color .25s;
+    font-family:'JetBrains Mono',monospace;font-size:0;color:#00131c;font-weight:700;letter-spacing:.08em}
+  .cur-ring.on{width:56px;height:56px;margin:-28px 0 0 -28px;border-color:var(--sky);background:rgba(0,160,224,.12)}
+  .cur-ring.label{width:64px;height:64px;margin:-32px 0 0 -32px;background:var(--sky);border-color:var(--sky);font-size:10px}
+  .cur-ring.label::after{content:attr(data-label)}
+  body.has-cursor, body.has-cursor a, body.has-cursor button{cursor:none}
+}
+
+/* split-line heading reveal */
+h2 .w{display:inline-block;overflow:hidden;vertical-align:bottom}
+h2 .w>i{display:inline-block;font-style:inherit;transform:translateY(115%);transition:transform .85s cubic-bezier(.2,.75,.2,1)}
+h2.split-in .w>i{transform:none}
+@media (prefers-reduced-motion: reduce){h2 .w>i{transform:none;transition:none}}
+
+/* tricolor page-exit wipe */
+.wipe-nav{position:fixed;inset:0;z-index:3000;display:flex;pointer-events:none;transform:translateX(-101%)}
+.wipe-nav i{flex:1}
+.wipe-nav i:nth-child(1){background:var(--sky)}
+.wipe-nav i:nth-child(2){background:var(--blue-d)}
+.wipe-nav i:nth-child(3){background:var(--red)}
+.wipe-nav.go{transition:transform .42s cubic-bezier(.7,0,.2,1);transform:translateX(0)}
+
+/* ghosted display type behind sections */
+.ghostword{position:absolute;left:50%;top:8px;transform:translateX(-50%);font-weight:900;font-size:clamp(90px,17vw,260px);letter-spacing:.02em;line-height:1;text-transform:uppercase;color:transparent;-webkit-text-stroke:1px rgba(150,158,172,.12);pointer-events:none;user-select:none;white-space:nowrap;z-index:0}
+section{position:relative}
+section>.wrap{position:relative;z-index:1}
+
+/* scroll cue */
+.scroll-cue{position:absolute;left:50%;bottom:88px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.3em;color:var(--mut);z-index:2}
+.scroll-cue::after{content:"";width:1px;height:42px;background:linear-gradient(var(--sky),transparent);animation:cue 1.8s ease-in-out infinite}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:960px){.scroll-cue{display:none}}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:3500;background:rgba(5,6,9,.94);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;opacity:0;pointer-events:none;transition:opacity .35s}
+.lb.open{opacity:1;pointer-events:auto}
+.lb img{max-width:88vw;max-height:74vh;border:1px solid var(--line);box-shadow:0 40px 90px -30px #000}
+.lb .lb-cap{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#dfe6f2}
+.lb .lb-cap b{color:var(--sky)}
+.lb .lb-x{position:absolute;top:22px;right:26px;background:none;border:1px solid #333a47;color:#dfe6f2;width:44px;height:44px;font-size:16px;cursor:pointer;transition:.2s}
+.lb .lb-x:hover{border-color:var(--sky);color:var(--sky)}
+.lb .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:none;border:1px solid #333a47;color:#dfe6f2;width:44px;height:44px;font-size:16px;cursor:pointer;transition:.2s}
+.lb .lb-nav:hover{border-color:var(--sky);color:var(--sky)}
+.lb .lb-prev{left:22px}
+.lb .lb-next{right:22px}
+
+/* keyboard focus */
+:focus-visible{outline:2px solid var(--sky);outline-offset:3px}

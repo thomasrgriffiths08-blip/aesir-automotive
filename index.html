@@ -117,7 +117,18 @@ body.ready .veil{opacity:1}
 
 /* ============ HERO ============ */
 .hero{height:100svh;min-height:640px;position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
-.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.9) contrast(1.06)}
+.hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:saturate(.9) contrast(1.06);animation:kb 34s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.08)}}
+@media (prefers-reduced-motion: reduce){.hero video{animation:none}}
+/* staggered hero entrance once the intro lets go */
+.hero-inner>*{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.75,.2,1)}
+.hero-inner>*:nth-child(1){transition-delay:.05s}
+.hero-inner>*:nth-child(2){transition-delay:.15s}
+.hero-inner>*:nth-child(3){transition-delay:.28s}
+.hero-inner>*:nth-child(4){transition-delay:.4s}
+.hero-inner>*:nth-child(5){transition-delay:.52s}
+body.ready .hero-inner>*{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){.hero-inner>*{opacity:1;transform:none;transition:none}}
 /* never show WebKit's YouTube-style play glyph if autoplay is momentarily blocked */
 video::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
 video::-webkit-media-controls{display:none!important}
@@ -262,6 +273,8 @@ video::-webkit-media-controls{display:none!important}
 .quoteline{border-left:3px solid var(--blue-d);padding:6px 0 6px 20px;margin-top:24px;font-size:15px;color:var(--ink);font-weight:600}
 .quoteline small{display:block;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--dim);font-weight:400;letter-spacing:.14em;margin-top:6px}
 
+section.has-gw{overflow:hidden}
+
 /* ============ FAQ ============ */
 .faq{padding:0 0 110px}
 .faq-list{margin-top:44px;border-top:1px solid var(--line)}
@@ -352,7 +365,7 @@ video::-webkit-media-controls{display:none!important}
   <video id="heroVid" loop muted playsinline preload="auto" autoplay
     poster="video/poster.jpg" src="video/hero.mp4"></video>
   <div class="shade"></div>
-  <div class="wrap hero-inner veil">
+  <div class="wrap hero-inner">
     <div class="g-badge"><span class="gball"></span><span class="stars">★★★★★</span><span><b>5.0</b> · 20 GOOGLE REVIEWS</span></div>
     <h1>Independent<br><span class="blue">BMW</span> <span class="ghost">Specialists</span></h1>
     <p class="hero-sub">Servicing, dealer-level diagnostics and <b>full engine rebuilds</b> — for everything the BMW group has ever built. <b>MINI to Rolls-Royce</b>, modern M cars to late-20th-century classics.</p>
@@ -362,6 +375,7 @@ video::-webkit-media-controls{display:none!important}
     </div>
     <div class="coords">51.5812°N · 0.4561°W — <b>POND FARM, UXBRIDGE UB9</b></div>
   </div>
+  <div class="scroll-cue">SCROLL</div>
   <div class="hero-strip veil">
     <div class="wrap">
       <div class="stat"><b><span data-count="5" data-dec="1">0.0</span><span class="sym">★</span></b><span>Google rating</span></div>
@@ -380,7 +394,8 @@ video::-webkit-media-controls{display:none!important}
 </div>
 
 <!-- ============ SERVICES ============ -->
-<section class="services" id="services">
+<section class="services has-gw" id="services">
+  <span class="ghostword" aria-hidden="true">Services</span>
   <div class="wrap">
     <div class="rv">
       <div class="kicker">What we do</div>
@@ -388,26 +403,27 @@ video::-webkit-media-controls{display:none!important}
       <p class="lead">Every job starts with a proper diagnosis and ends with clear photos and a straight explanation — the thing our reviews mention most.</p>
     </div>
     <div class="svc-grid">
-      <a class="svc feature rv" href="services/engine-rebuilds.html">
+      <a class="svc feature rv" data-cursor="OPEN" href="services/engine-rebuilds.html">
         <span class="tag">The specialty</span>
         <h3>Engine rebuilds &amp; machining</h3>
         <p>Bottom ends, bearings, skimmed heads, full rebuilds — done on the bench in our workshop, not sent away. From M V10s to classic straight-sixes.</p>
         <span class="more">Read more →</span>
       </a>
-      <a class="svc rv" href="services/servicing.html"><span class="num">02</span><h3>Servicing &amp; Oil</h3><p>Manufacturer-schedule servicing, genuine or OEM parts, digital history updated.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" href="services/diagnostics.html"><span class="num">03</span><h3>Engine Diagnostics</h3><p>Dealer-level kit. We find the fault, not just the code — evidence before any work.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" href="services/brakes-suspension.html"><span class="num">04</span><h3>Brakes &amp; Suspension</h3><p>Pads, discs, calipers, bushes, dampers. Torqued to spec and road-tested.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" href="services/electrical-coding.html"><span class="num">05</span><h3>Electrical &amp; Coding</h3><p>Faults traced properly — batteries registered, modules coded, lights out for good.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" href="services/air-conditioning.html"><span class="num">06</span><h3>Air Conditioning</h3><p>Re-gas, leak detection, cabin filters. Cold again before summer hits.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" href="services/classics-restoration.html"><span class="num">07</span><h3>Classics &amp; Restoration</h3><p>Late-20th-century BMWs are the house passion. Sympathetic work, period-correct parts.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" href="services/pre-purchase-inspections.html"><span class="num">08</span><h3>Pre-Purchase Inspections</h3><p>We inspect it like we'd have to fix it. Full written report before you commit.</p><span class="more">Read more →</span></a>
-      <a class="svc rv" href="services/mot-prep.html"><span class="num">09</span><h3>MOT Prep &amp; Repairs</h3><p>Pre-MOT checks and repairs — with automatic reminders so you never miss a date.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/servicing.html"><span class="num">02</span><h3>Servicing &amp; Oil</h3><p>Manufacturer-schedule servicing, genuine or OEM parts, digital history updated.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/diagnostics.html"><span class="num">03</span><h3>Engine Diagnostics</h3><p>Dealer-level kit. We find the fault, not just the code — evidence before any work.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/brakes-suspension.html"><span class="num">04</span><h3>Brakes &amp; Suspension</h3><p>Pads, discs, calipers, bushes, dampers. Torqued to spec and road-tested.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/electrical-coding.html"><span class="num">05</span><h3>Electrical &amp; Coding</h3><p>Faults traced properly — batteries registered, modules coded, lights out for good.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/air-conditioning.html"><span class="num">06</span><h3>Air Conditioning</h3><p>Re-gas, leak detection, cabin filters. Cold again before summer hits.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/classics-restoration.html"><span class="num">07</span><h3>Classics &amp; Restoration</h3><p>Late-20th-century BMWs are the house passion. Sympathetic work, period-correct parts.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/pre-purchase-inspections.html"><span class="num">08</span><h3>Pre-Purchase Inspections</h3><p>We inspect it like we'd have to fix it. Full written report before you commit.</p><span class="more">Read more →</span></a>
+      <a class="svc rv" data-cursor="OPEN" href="services/mot-prep.html"><span class="num">09</span><h3>MOT Prep &amp; Repairs</h3><p>Pre-MOT checks and repairs — with automatic reminders so you never miss a date.</p><span class="more">Read more →</span></a>
     </div>
   </div>
 </section>
 
 <!-- ============ WORKSHOP FEED ============ -->
-<section class="feed" id="feed">
+<section class="feed has-gw" id="feed">
+  <span class="ghostword" aria-hidden="true">The Work</span>
   <div class="wrap">
     <div class="feed-head rv">
       <div>
@@ -417,22 +433,23 @@ video::-webkit-media-controls{display:none!important}
       <a class="ig" href="https://www.instagram.com/aesir.automotive/" target="_blank" rel="noopener">FOLLOW THE FEED → @AESIR.AUTOMOTIVE</a>
     </div>
     <div class="feed-grid">
-      <div class="shot tall rv"><img src="img/z3-workshop.jpg" alt="Z3 M Coupé on the ramp, S50 engine out"><span class="cap"><b>Z3 M COUPÉ</b> · S50B32 fired straight up</span></div>
-      <div class="shot rv"><img src="img/v10-engine.jpg" alt="BMW S85 V10 engine bay" style="object-position:center 42%"><span class="cap"><b>E60 M5 TOURING</b> · S85 V10</span></div>
-      <div class="shot rv"><img src="img/ghost-block.jpg" alt="Rolls-Royce Ghost engine block"><span class="cap"><b>ROLLS-ROYCE GHOST</b> · oil leaks, sorted</span></div>
-      <div class="shot tall rv"><img src="img/f430.jpg" alt="Ferrari F430 in the workshop"><span class="cap"><b>FERRARI F430</b> · multiple misfires</span></div>
-      <div class="shot rv"><img src="img/bearings.jpg" alt="E60 M5 big end bearings"><span class="cap"><b>E60 M5</b> · big ends — close shave</span></div>
-      <div class="shot rv"><img src="img/m20-head.jpg" alt="BMW M20 cylinder head"><span class="cap"><b>M20 STRAIGHT-SIX</b> · head rebuild</span></div>
-      <div class="shot rv"><img src="img/spirit.jpg" alt="Rolls-Royce Spirit of Ecstasy repair" style="object-position:center 60%"><span class="cap"><b>SPIRIT OF ECSTASY</b> · back in working order</span></div>
-      <div class="shot rv"><img src="img/i8.jpg" alt="BMW i8" style="object-position:center 45%"><span class="cap"><b>BMW i8</b> · "what a car!!!!"</span></div>
-      <div class="shot wide rv"><img src="img/z3-sunset.jpg" alt="Z3 M road test at sunset" style="object-position:center 55%"><span class="cap"><b>TESTED &amp; READY</b> · "see you in 600 miles yeah?!"</span></div>
-      <div class="shot rv"><img src="img/ferrari-classic.jpg" alt="Classic Ferrari" style="object-position:center 55%"><span class="cap"><b>75 YEARS OF FERRARI</b> · Silverstone Classic</span></div>
+      <div class="shot tall rv" data-cursor="VIEW"><img src="img/z3-workshop.jpg" alt="Z3 M Coupé on the ramp, S50 engine out"><span class="cap"><b>Z3 M COUPÉ</b> · S50B32 fired straight up</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/v10-engine.jpg" alt="BMW S85 V10 engine bay" style="object-position:center 42%"><span class="cap"><b>E60 M5 TOURING</b> · S85 V10</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/ghost-block.jpg" alt="Rolls-Royce Ghost engine block"><span class="cap"><b>ROLLS-ROYCE GHOST</b> · oil leaks, sorted</span></div>
+      <div class="shot tall rv" data-cursor="VIEW"><img src="img/f430.jpg" alt="Ferrari F430 in the workshop"><span class="cap"><b>FERRARI F430</b> · multiple misfires</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/bearings.jpg" alt="E60 M5 big end bearings"><span class="cap"><b>E60 M5</b> · big ends — close shave</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/m20-head.jpg" alt="BMW M20 cylinder head"><span class="cap"><b>M20 STRAIGHT-SIX</b> · head rebuild</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/spirit.jpg" alt="Rolls-Royce Spirit of Ecstasy repair" style="object-position:center 60%"><span class="cap"><b>SPIRIT OF ECSTASY</b> · back in working order</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/i8.jpg" alt="BMW i8" style="object-position:center 45%"><span class="cap"><b>BMW i8</b> · "what a car!!!!"</span></div>
+      <div class="shot wide rv" data-cursor="VIEW"><img src="img/z3-sunset.jpg" alt="Z3 M road test at sunset" style="object-position:center 55%"><span class="cap"><b>TESTED &amp; READY</b> · "see you in 600 miles yeah?!"</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/ferrari-classic.jpg" alt="Classic Ferrari" style="object-position:center 55%"><span class="cap"><b>75 YEARS OF FERRARI</b> · Silverstone Classic</span></div>
     </div>
   </div>
 </section>
 
 <!-- ============ SYSTEMS ============ -->
-<section class="systems" id="systems">
+<section class="systems has-gw" id="systems">
+  <span class="ghostword" aria-hidden="true">Always On</span>
   <div class="wrap">
     <div class="rv" style="max-width:640px">
       <div class="kicker">Always on</div>
@@ -440,19 +457,19 @@ video::-webkit-media-controls{display:none!important}
       <p class="lead">One mechanic under a car can't answer every call — so the systems do it. Explore each one; they're live on this site.</p>
     </div>
     <div class="sys-grid">
-      <a class="sys-card rv" href="systems/textback.html">
+      <a class="sys-card rv" data-cursor="OPEN" href="systems/textback.html">
         <span class="icon">📵</span>
         <h3>Missed-Call Text-Back</h3>
         <p>Can't get through? You get a text back within seconds — no voicemail black hole. Try the live simulator.</p>
         <span class="go">Open the system →</span>
       </a>
-      <a class="sys-card rv" href="systems/reminders.html">
+      <a class="sys-card rv" data-cursor="OPEN" href="systems/reminders.html">
         <span class="icon">📅</span>
         <h3>MOT &amp; Service Reminders</h3>
         <p>Add your reg once. Texts arrive four weeks out, one week out, and the day before your slot.</p>
         <span class="go">Open the system →</span>
       </a>
-      <a class="sys-card rv" href="systems/reviews.html">
+      <a class="sys-card rv" data-cursor="OPEN" href="systems/reviews.html">
         <span class="icon">⭐</span>
         <h3>Review Engine</h3>
         <p>One text after every job. Five-star experiences go to Google — anything less comes straight back to Neil, privately.</p>
@@ -463,7 +480,8 @@ video::-webkit-media-controls{display:none!important}
 </section>
 
 <!-- ============ BOOKING ============ -->
-<section class="booking" id="book">
+<section class="booking has-gw" id="book">
+  <span class="ghostword" aria-hidden="true">Book It</span>
   <div class="wrap">
     <div class="rv">
       <div class="kicker">Book online · 24/7</div>
@@ -516,7 +534,8 @@ video::-webkit-media-controls{display:none!important}
 </section>
 
 <!-- ============ REVIEWS ============ -->
-<section class="reviews" id="reviews">
+<section class="reviews has-gw" id="reviews">
+  <span class="ghostword" aria-hidden="true">Five Stars</span>
   <div class="wrap">
     <div class="rev-head rv">
       <div>
@@ -577,7 +596,8 @@ video::-webkit-media-controls{display:none!important}
 </section>
 
 <!-- ============ FAQ ============ -->
-<section class="faq" id="faq">
+<section class="faq has-gw" id="faq">
+  <span class="ghostword" aria-hidden="true">Asked</span>
   <div class="wrap">
     <div class="rv">
       <div class="kicker">Straight answers</div>
@@ -647,13 +667,21 @@ video::-webkit-media-controls{display:none!important}
       <span class="mstripe"><i></i><i></i><i></i></span>
       <span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span>
     </a>
-    <span class="mono">© 2026 ÆSIR AUTOMOTIVE LTD · CO. 12705996 · INDEPENDENT — NOT AFFILIATED WITH BMW AG OR ROLLS-ROYCE MOTOR CARS · <a href="admin.html">DIARY</a></span>
+    <span class="mono"><span id="uxClock"></span> · © 2026 ÆSIR AUTOMOTIVE LTD · CO. 12705996 · INDEPENDENT — NOT AFFILIATED WITH BMW AG OR ROLLS-ROYCE MOTOR CARS · <a href="admin.html">DIARY</a></span>
   </div>
 </footer>
 
 <div class="mobar">
   <a class="btn ghost" href="tel:07956658177">✆ Call</a>
   <a class="btn" href="#book">Book online</a>
+</div>
+
+<div class="lb" id="lb" role="dialog" aria-label="Photo viewer">
+  <button class="lb-x" aria-label="Close">✕</button>
+  <button class="lb-nav lb-prev" aria-label="Previous">←</button>
+  <img id="lbImg" alt="">
+  <div class="lb-cap" id="lbCap"></div>
+  <button class="lb-nav lb-next" aria-label="Next">→</button>
 </div>
 
 <script src="js/shared.js"></script>
@@ -862,6 +890,39 @@ document.getElementById('wAgain').onclick = () => {
   ['fName','fPhone','fReg','fModel'].forEach(id => document.getElementById(id).value = '');
   renderTimes(); step();
 };
+
+/* ============ WORKSHOP FEED LIGHTBOX ============ */
+(() => {
+  const shots = [...document.querySelectorAll('.feed-grid .shot')];
+  const lb = document.getElementById('lb'), img = document.getElementById('lbImg'), cap = document.getElementById('lbCap');
+  let cur = 0;
+  function show(i){
+    cur = (i + shots.length) % shots.length;
+    img.src = shots[cur].querySelector('img').src;
+    cap.innerHTML = shots[cur].querySelector('.cap').innerHTML;
+  }
+  function open(i){ show(i); lb.classList.add('open'); }
+  function close(){ lb.classList.remove('open'); }
+  shots.forEach((s, i) => { s.style.cursor = 'pointer'; s.addEventListener('click', () => open(i)); });
+  lb.querySelector('.lb-x').onclick = close;
+  lb.querySelector('.lb-prev').onclick = e => { e.stopPropagation(); show(cur - 1); };
+  lb.querySelector('.lb-next').onclick = e => { e.stopPropagation(); show(cur + 1); };
+  lb.addEventListener('click', e => { if (e.target === lb) close(); });
+  addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowRight') show(cur + 1);
+    if (e.key === 'ArrowLeft') show(cur - 1);
+  });
+})();
+
+/* live workshop clock */
+(() => {
+  const el = document.getElementById('uxClock');
+  if (!el) return;
+  const tick = () => el.textContent = 'UXBRIDGE ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/London'});
+  tick(); setInterval(tick, 30000);
+})();
 </script>
 </body>
 </html>
