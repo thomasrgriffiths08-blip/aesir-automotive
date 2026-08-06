@@ -213,7 +213,10 @@ nav.site.solid{border-color:var(--line);background:rgba(10,11,14,.92)}
 /* footer */
 footer.site{padding:40px 0;border-top:1px solid var(--line);background:var(--bg2)}
 .f-in{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
-.f-in .mono{font-size:10.5px;color:var(--dim);letter-spacing:.08em}
+/* the statutory colophon: company name, number, place of registration and
+   registered office, as a limited company's website must carry */
+.f-in .mono{font-size:10.5px;color:var(--dim);letter-spacing:.08em;line-height:2;flex:1 1 460px;min-width:0;text-align:right}
+@media(max-width:760px){.f-in .mono{text-align:left;flex-basis:100%}}
 .f-in a:hover{color:var(--acc)}
 
 /* mobile bar */

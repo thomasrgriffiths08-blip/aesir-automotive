@@ -77,7 +77,7 @@
     {"@type": "Question", "name": "What are your opening hours?",
      "acceptedAnswer": {"@type": "Answer", "text": "Monday to Friday, 8am to 6pm. Outside those hours you can book online 24/7 or message the workshop on WhatsApp at 07956 658177."}},
     {"@type": "Question", "name": "How do I book my car in?",
-     "acceptedAnswer": {"@type": "Answer", "text": "Book online any time at the website's booking section, call or WhatsApp Neil on 07956 658177. Online bookings get an instant confirmation and a reminder text the day before."}},
+     "acceptedAnswer": {"@type": "Answer", "text": "Book online any time at the website's booking section, call or WhatsApp Neil on 07956 658177. Online bookings get an instant on-screen confirmation with a reference, and the slot is held in the workshop diary straight away."}},
     {"@type": "Question", "name": "Who runs Æsir Automotive?",
      "acceptedAnswer": {"@type": "Answer", "text": "Neil Haddow, director since 2020. It's a one-mechanic workshop — the person you speak to is the person working on your car. Reviewers on Google describe the work as professional, fairly priced and completed to a high standard."}}
   ]
@@ -614,11 +614,12 @@ section.has-gw{overflow:hidden}
     </div>
     <div class="book-grid">
       <div class="rv">
-        <p class="lead">The diary is live — slots already taken disappear for everyone, so there's no double-booking. You'll get an instant confirmation with a reference, and a reminder the day before.</p>
+        <!-- no automated SMS yet: restore the reminder promise once BOOKING_WEBHOOK is wired -->
+        <p class="lead">The diary is live — slots already taken disappear for everyone, so there's no double-booking. You'll get a confirmation with a reference on screen, and it lands straight in the workshop diary.</p>
         <div class="book-points">
           <div class="bp"><span class="ic">01</span><div><b>Choose your service</b><span>Not sure what's wrong? Pick diagnostics and describe it.</span></div></div>
           <div class="bp"><span class="ic">02</span><div><b>Pick a real slot</b><span>Live availability — no "we'll call you back".</span></div></div>
-          <div class="bp"><span class="ic">03</span><div><b>Confirmed instantly</b><span>Booking reference + SMS confirmation + day-before reminder.</span></div></div>
+          <div class="bp"><span class="ic">03</span><div><b>Confirmed instantly</b><span>Your reference on screen, and the slot held in Neil's diary.</span></div></div>
         </div>
         <div class="book-plate">
           <img src="img/e30-bay.jpg" alt="Classic BMW engine bay in for a service at Pond Farm" loading="lazy">
@@ -653,7 +654,7 @@ section.has-gw{overflow:hidden}
           <div class="ref" id="doneRef">REF AES-0000</div>
           <p id="doneLine">Thursday 8:30 — Service &amp; Oil</p>
           <div class="w-sms">
-            <div class="from">SMS · ÆSIR AUTOMOTIVE</div>
+            <div class="from">YOUR BOOKING</div>
             <div class="msg" id="doneSms"></div>
           </div>
           <button class="btn ghost" style="margin-top:20px" id="wAgain">Book another</button>
@@ -750,7 +751,7 @@ section.has-gw{overflow:hidden}
       </details>
       <details>
         <summary>How do I book my car in?</summary>
-        <div class="a">Book online any time in the <a href="#book" style="color:var(--acc)">booking section</a>, call or WhatsApp Neil on 07956 658177. Online bookings get an instant confirmation and a reminder text the day before.</div>
+        <div class="a">Book online any time in the <a href="#book" style="color:var(--acc)">booking section</a>, call or WhatsApp Neil on 07956 658177. Online bookings get an instant on-screen confirmation with a reference, and the slot is held in the workshop diary straight away.</div>
       </details>
       <details>
         <summary>Who runs Æsir Automotive?</summary>
@@ -807,7 +808,7 @@ section.has-gw{overflow:hidden}
       <span class="mstripe"><i></i><i></i><i></i></span>
       <span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span>
     </a>
-    <span class="mono">© 2026 ÆSIR AUTOMOTIVE LTD · CO. 12705996 · INDEPENDENT — NOT AFFILIATED WITH BMW AG OR ROLLS-ROYCE MOTOR CARS</span>
+    <span class="mono">© 2026 AESIR AUTOMOTIVE LTD · REGISTERED IN ENGLAND &amp; WALES NO. 12705996 · REGISTERED OFFICE: 3D POND FARM, NEW YEARS GREEN LANE, HAREFIELD, UXBRIDGE UB9 6LX · INDEPENDENT — NOT AFFILIATED WITH BMW AG OR ROLLS-ROYCE MOTOR CARS</span>
   </div>
 </footer>
 
@@ -986,7 +987,8 @@ document.getElementById('wSubmit').onclick = async () => {
   document.getElementById('doneLine').textContent = state.day + ' · ' + time + ' — ' + state.svc;
   typeInto(document.getElementById('doneSms'),
     'Hi ' + name.split(' ')[0] + ' — you\u2019re booked in for ' + state.svc + ' on ' + state.day + ' at ' + time +
-    ' (ref ' + ref + '). We\u2019ll text a reminder the day before. Pond Farm, UB9 6LX. Need to change it? Just reply.');
+    ' (ref ' + ref + '). Neil has this in the workshop diary. Pond Farm, Newyears Green Lane, UB9 6LX. ' +
+    'Need to change it? Call or WhatsApp 07956 658177.');
   document.getElementById('wForm').style.display = 'none';
   document.getElementById('wDone').style.display = 'block';
   btn.textContent = 'Confirm booking →';
