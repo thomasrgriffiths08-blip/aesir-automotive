@@ -47,11 +47,12 @@ const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* nav tuck: hide going down, return going up */
 (() => {
   if (!nav) return;
+  if (matchMedia('(max-width: 960px)').matches || !matchMedia('(pointer:fine)').matches) return; /* static nav on mobile — no bouncing */
   let last = scrollY;
   addEventListener('scroll', () => {
     const y = scrollY;
-    nav.classList.toggle('tuck', y > 160 && y > last + 2);
-    if (y < last - 2 || y < 160) nav.classList.remove('tuck');
+    if (y > 200 && y > last + 14) nav.classList.add('tuck');
+    else if (y < last - 14 || y < 200) nav.classList.remove('tuck');
     last = y;
   }, {passive:true});
 })();

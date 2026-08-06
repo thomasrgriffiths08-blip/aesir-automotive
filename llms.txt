@@ -40,6 +40,9 @@
 - [Gallery — real work](/gallery.html): photos of actual jobs
 - [Reviews](/reviews.html): all Google review quotes
 - [Contact & directions](/contact.html)
+- [FAQs](/faq.html): booking, pricing approach, warranty, parts
+- [Why choose Æsir](/why-us.html)
+- [Cars we work on](/cars-we-work-on.html): BMW eras, M cars, MINI, Rolls-Royce, classics
 - [Home / booking](/index.html): services, live 24/7 online booking, reviews, contact
 - [Engine rebuilds & machining](/services/engine-rebuilds.html): the specialty — in-house rebuilds
 - [Servicing](/services/servicing.html): manufacturer-schedule servicing, genuine/OEM parts
@@ -50,8 +53,5 @@
 - [Classics & restoration](/services/classics-restoration.html): late-20th-century BMW specialty
 - [Pre-purchase inspections](/services/pre-purchase-inspections.html): written reports
 - [MOT prep & repairs](/services/mot-prep.html)
-- [Missed-call text-back](/systems/textback.html): how the callback system works
-- [MOT & service reminders](/systems/reminders.html): automatic reminder texts
-- [Review engine](/systems/reviews.html): post-job feedback flow
 
 Independent specialist — not affiliated with BMW AG or Rolls-Royce Motor Cars.

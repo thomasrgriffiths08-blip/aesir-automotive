@@ -5,6 +5,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
+Disallow: /systems/
 Disallow: /compare.html
 
 # --- AI search / answer engines (citation crawlers) ---
