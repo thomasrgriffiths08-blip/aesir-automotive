@@ -13,6 +13,49 @@
 
 ---
 
+## STATUS — already done since this runbook was generated
+
+Ticked off in commits `7d4592f`, `26ac694`, `a94f1d1` and later. **Re-read the
+runbook steps below with these in mind — several are already complete.**
+
+- **Step 4 — JSONBlob emptied.** Done. It was publicly exposing Tom's own name
+  and mobile number from an earlier test booking. Wiped; verified empty.
+- **Step 5 — untrue copy removed.** Done. All seven "SMS confirmation" /
+  "reminder the day before" claims corrected, including the JSON-LD FAQ answer
+  and the mocked SMS bubble. MOT "automatic reminder texts" corrected on the
+  service page, its meta description and its schema.
+- **Step 8 — silent failure fixed.** Done. `dbPut()`'s result is captured; a
+  failed save now shows a distinct "Not booked" panel with call and WhatsApp,
+  never the tick. Verified headless.
+- **Step 9 — reference generation fixed.** Done. Timestamp-based, no collisions.
+- **Step 10 — admin output escaped.** Done. Customer fields go through
+  `createElement`/`textContent`; `toast()` in shared.js likewise. Phone numbers
+  became tap-to-call and WhatsApp links while I was in there.
+- **Step 11 — customer records no longer cached on visitors' devices.** Done.
+  `dbGet`/`dbPut` strip bookings to `{iso,time}` for anyone not on admin.html.
+- **Step 13 — closed days checked at submit.** Done.
+- **Step 14 — validation and abuse controls.** Done. Honeypot, UK mobile format
+  check, `maxlength` on all four inputs, aria-labels. Verified headless.
+- **Supabase kit corrected** (prerequisite for steps 6 and 7). The staged
+  version would have leaked the same data via a `bookings public read` policy.
+  Rewritten: insert-only for the public, staff-only reads, a `taken_slots` view
+  exposing only date and time, a `unique(iso,slot_time)` double-booking guard,
+  and a 30-day purge function. `supabase/README.md` is a 15-minute runbook.
+- **Privacy notice published** (`privacy.html`) and linked from every footer.
+- **Companies Act trading disclosure** added to all 17 page footers, verified
+  against the Companies House register.
+- **Kill switch added.** `BOOKINGS_OPEN` at the top of the booking script in
+  `index.html`. Set it to `false` and redeploy to replace the widget with call +
+  WhatsApp, without touching anything else — that is step 1 as a one-line edit.
+  Currently `true`; changing it is a client-facing decision, so it was left to Tom.
+
+**Still open and still the gate: steps 6, 7, 15, 19 and 21.** Supabase, the
+notification webhook, Neil's sign-off, and the domain.
+
+---
+
+---
+
 ## Correction to the audit before you start
 
 **The Supabase kit in the repo has already been rewritten and is now safe.** Several findings say `supabase/setup.sql:30` grants `bookings public read` — that is stale. The current file (commit `26ac694`, "Rewrite the Supabase migration kit — the staged one leaked the same data") has:

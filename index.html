@@ -905,153 +905,187 @@ mq.innerHTML += mq.innerHTML;
    booking POSTs there as JSON — that's the whole backend integration. */
 const BOOKING_WEBHOOK = '';
 
-const SERVICES = ['Service & Oil','Diagnostics','Brakes','Air Con','Electrical','MOT Prep','Engine work','Something else'];
-const TIMES = ['08:00','08:30','09:30','10:30','12:00','14:00','15:30','16:30'];
-const state = {svc:null, day:null, time:null};
-let DB = {blocked:{}, closedDays:[], bookings:[]};
+/* KILL SWITCH — flip to false and redeploy to take the online form out of
+   service without touching anything else. The section keeps its copy and its
+   photography; the widget is replaced by call + WhatsApp, which is where the
+   work came from anyway. Use it if you'd rather not collect names and mobile
+   numbers into the public JSONBlob store while the Supabase migration is
+   pending (see supabase/README.md). */
+const BOOKINGS_OPEN = true;
 
-function chip(txt, group, key, onSel){
-  const b = document.createElement('button');
-  b.className = 'chip'; b.type = 'button'; b.textContent = txt;
-  b.onclick = () => {
-    [...group.children].forEach(c => c.classList.remove('sel'));
-    b.classList.add('sel'); state[key] = txt; if (onSel) onSel(); step();
-  };
-  return b;
-}
-const svcC = document.getElementById('svcChips'), dayC = document.getElementById('dayChips'), timeC = document.getElementById('timeChips');
-SERVICES.forEach(sv => svcC.appendChild(chip(sv, svcC, 'svc')));
-
-/* local-date ISO — toISOString() is UTC and mislabels the day just after midnight in BST */
-const isoLocal = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-function dayISO(){ const sel = [...dayC.children].find(c => c.classList.contains('sel')); return sel ? sel.dataset.iso : null; }
-function isTaken(iso, t){
-  return DB.bookings.some(b => b.iso === iso && b.time === t) || (DB.blocked[iso] || []).includes(t);
-}
-/* day chips come from the LIVE diary — days Neil closes disappear for everyone */
-function buildDays(){
-  const kept = state.day; dayC.innerHTML = '';
-  for (let d = new Date(), n = 0; dayC.children.length < 6 && n < 21; d.setDate(d.getDate() + 1)){
-    n++; if (n === 1) continue;
-    if (d.getDay() === 0 || d.getDay() === 6) continue; /* workshop hours are Mon–Fri */
-    const iso = isoLocal(d);
-    if (DB.closedDays.includes(iso)) continue;
-    const label = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
-    const c = chip(label, dayC, 'day', renderTimes);
-    c.dataset.iso = iso;
-    if (label === kept) c.classList.add('sel');
-    dayC.appendChild(c);
+/* The booking widget lives in its own scope so the kill switch can bail out
+   early without aborting anything else on the page. */
+(function setupBooking(){
+  if (!BOOKINGS_OPEN){
+    const w = document.getElementById('widget');
+    w.innerHTML = '';
+    const h = document.createElement('div'); h.className = 'w-head';
+    const b = document.createElement('b'); b.textContent = 'Book your car in';
+    h.appendChild(b);
+    const p = document.createElement('p');
+    p.style.cssText = 'color:var(--mut);font-size:14.5px;margin:16px 0 22px';
+    p.textContent = 'Online booking is off while we finish setting it up. Call or message Neil directly — you’ll get a straight answer faster anyway.';
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap';
+    const call = document.createElement('a');
+    call.className = 'btn'; call.href = 'tel:07956658177'; call.textContent = '✆ Call 07956 658177';
+    const wa = document.createElement('a');
+    wa.className = 'btn ghost'; wa.target = '_blank'; wa.rel = 'noopener';
+    wa.href = 'https://wa.me/447956658177?text=' + encodeURIComponent('Hi Neil — I’d like to book my car in. It’s a ');
+    wa.textContent = 'WhatsApp Neil';
+    row.append(call, wa);
+    w.append(h, p, row);
+    return;                       /* nothing below this line is set up */
   }
-}
-function renderTimes(){
-  timeC.innerHTML = ''; state.time = null;
-  const iso = dayISO();
-  TIMES.forEach(t => {
-    const b = chip(t, timeC, 'time');
-    if (iso && isTaken(iso, t)) b.disabled = true;
-    timeC.appendChild(b);
-  });
-}
-buildDays(); renderTimes();
-/* arriving from a service page pre-selects that service */
-const preSvc = new URLSearchParams(location.search).get('svc');
-if (preSvc){
-  const c = [...svcC.children].find(x => x.textContent === preSvc);
-  if (c) c.click();
-}
-dbGet().then(d => { DB = d; buildDays(); renderTimes(); });
 
-function step(){
-  const n = state.svc ? (state.day && state.time ? 3 : 2) : 1;
-  document.getElementById('wStep').textContent = 'STEP ' + n + ' / 3';
-}
+  const SERVICES = ['Service & Oil','Diagnostics','Brakes','Air Con','Electrical','MOT Prep','Engine work','Something else'];
+  const TIMES = ['08:00','08:30','09:30','10:30','12:00','14:00','15:30','16:30'];
+  const state = {svc:null, day:null, time:null};
+  let DB = {blocked:{}, closedDays:[], bookings:[]};
 
-document.getElementById('wSubmit').onclick = async () => {
-  const btn = document.getElementById('wSubmit');
-  const name = document.getElementById('fName').value.trim();
-  const phone = document.getElementById('fPhone').value.trim();
-  const reg = document.getElementById('fReg').value.trim().toUpperCase();
-  const model = document.getElementById('fModel').value.trim();
-  const fail = msg => {           /* never tell someone they're booked when they aren't */
-    document.getElementById('bookFailLine').textContent = msg;
+  function chip(txt, group, key, onSel){
+    const b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button'; b.textContent = txt;
+    b.onclick = () => {
+      [...group.children].forEach(c => c.classList.remove('sel'));
+      b.classList.add('sel'); state[key] = txt; if (onSel) onSel(); step();
+    };
+    return b;
+  }
+  const svcC = document.getElementById('svcChips'), dayC = document.getElementById('dayChips'), timeC = document.getElementById('timeChips');
+  SERVICES.forEach(sv => svcC.appendChild(chip(sv, svcC, 'svc')));
+
+  /* local-date ISO — toISOString() is UTC and mislabels the day just after midnight in BST */
+  const isoLocal = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  function dayISO(){ const sel = [...dayC.children].find(c => c.classList.contains('sel')); return sel ? sel.dataset.iso : null; }
+  function isTaken(iso, t){
+    return DB.bookings.some(b => b.iso === iso && b.time === t) || (DB.blocked[iso] || []).includes(t);
+  }
+  /* day chips come from the LIVE diary — days Neil closes disappear for everyone */
+  function buildDays(){
+    const kept = state.day; dayC.innerHTML = '';
+    for (let d = new Date(), n = 0; dayC.children.length < 6 && n < 21; d.setDate(d.getDate() + 1)){
+      n++; if (n === 1) continue;
+      if (d.getDay() === 0 || d.getDay() === 6) continue; /* workshop hours are Mon–Fri */
+      const iso = isoLocal(d);
+      if (DB.closedDays.includes(iso)) continue;
+      const label = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+      const c = chip(label, dayC, 'day', renderTimes);
+      c.dataset.iso = iso;
+      if (label === kept) c.classList.add('sel');
+      dayC.appendChild(c);
+    }
+  }
+  function renderTimes(){
+    timeC.innerHTML = ''; state.time = null;
+    const iso = dayISO();
+    TIMES.forEach(t => {
+      const b = chip(t, timeC, 'time');
+      if (iso && isTaken(iso, t)) b.disabled = true;
+      timeC.appendChild(b);
+    });
+  }
+  buildDays(); renderTimes();
+  /* arriving from a service page pre-selects that service */
+  const preSvc = new URLSearchParams(location.search).get('svc');
+  if (preSvc){
+    const c = [...svcC.children].find(x => x.textContent === preSvc);
+    if (c) c.click();
+  }
+  dbGet().then(d => { DB = d; buildDays(); renderTimes(); });
+
+  function step(){
+    const n = state.svc ? (state.day && state.time ? 3 : 2) : 1;
+    document.getElementById('wStep').textContent = 'STEP ' + n + ' / 3';
+  }
+
+  document.getElementById('wSubmit').onclick = async () => {
+    const btn = document.getElementById('wSubmit');
+    const name = document.getElementById('fName').value.trim();
+    const phone = document.getElementById('fPhone').value.trim();
+    const reg = document.getElementById('fReg').value.trim().toUpperCase();
+    const model = document.getElementById('fModel').value.trim();
+    const fail = msg => {           /* never tell someone they're booked when they aren't */
+      document.getElementById('bookFailLine').textContent = msg;
+      document.getElementById('wForm').style.display = 'none';
+      document.getElementById('wFail').style.display = 'block';
+      btn.textContent = 'Confirm booking →';
+    };
+    const missing = [];
+    if (!state.svc) missing.push('a service');
+    if (!state.day || !state.time) missing.push('a day & time');
+    if (!name || !phone) missing.push('your name & mobile');
+    if (missing.length){
+      btn.textContent = 'Add ' + missing[0] + ' ↑';
+      setTimeout(() => btn.textContent = 'Confirm booking →', 1800);
+      return;
+    }
+    if (document.getElementById('fCompany').value){ return; }   /* honeypot: bots fill it, people can't see it */
+    if (!/^(\+?44|0)[\d\s()-]{9,}$/.test(phone)){
+      btn.textContent = 'Check that mobile number ↑';
+      setTimeout(() => btn.textContent = 'Confirm booking →', 2200);
+      return;
+    }
+    btn.textContent = 'Confirming…';
+    const iso = dayISO(), time = state.time;
+    DB = await dbGet();                       /* fresh diary — no double-booking across devices */
+    if (DB.closedDays.includes(iso)){
+      buildDays(); renderTimes(); step();
+      btn.textContent = 'Neil just closed that day — pick another ↑';
+      setTimeout(() => btn.textContent = 'Confirm booking →', 2600);
+      return;
+    }
+    if (isTaken(iso, time)){
+      renderTimes(); step();
+      btn.textContent = 'That slot just went — pick another ↑';
+      setTimeout(() => btn.textContent = 'Confirm booking →', 2400);
+      return;
+    }
+    /* timestamp-based so two bookings can never share a reference — the old
+       length+random scheme collided constantly, and admin cancels by ref */
+    const ref = 'AES-' + Date.now().toString(36).slice(-4).toUpperCase() +
+                Math.floor(Math.random() * 36).toString(36).toUpperCase();
+    const booking = {ref, svc: state.svc, day: state.day, iso, time, name, phone, reg, model, ts: Date.now()};
+    DB.bookings.push(booking);
+    const saved = await dbPut(DB);
+    if (saved === 'taken'){
+      DB = await dbGet(); renderTimes(); step();
+      btn.textContent = 'That slot just went — pick another ↑';
+      setTimeout(() => btn.textContent = 'Confirm booking →', 2400);
+      return;
+    }
+    if (!saved){
+      fail('We couldn’t reach the diary just now, so this booking has NOT been saved. Call or WhatsApp and we’ll put you straight in.');
+      return;
+    }
+    if (BOOKING_WEBHOOK) fetch(BOOKING_WEBHOOK, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({source: 'aesir-website', ...booking})
+    }).catch(() => {});
+    document.getElementById('doneRef').textContent = 'REF ' + ref;
+    document.getElementById('doneLine').textContent = state.day + ' · ' + time + ' — ' + state.svc;
+    typeInto(document.getElementById('doneSms'),
+      'Hi ' + name.split(' ')[0] + ' — you\u2019re booked in for ' + state.svc + ' on ' + state.day + ' at ' + time +
+      ' (ref ' + ref + '). Neil has this in the workshop diary. Pond Farm, Newyears Green Lane, UB9 6LX. ' +
+      'Need to change it? Call or WhatsApp 07956 658177.');
     document.getElementById('wForm').style.display = 'none';
-    document.getElementById('wFail').style.display = 'block';
+    document.getElementById('wDone').style.display = 'block';
     btn.textContent = 'Confirm booking →';
+    toast('Slot ' + time + ' locked in the live diary');
   };
-  const missing = [];
-  if (!state.svc) missing.push('a service');
-  if (!state.day || !state.time) missing.push('a day & time');
-  if (!name || !phone) missing.push('your name & mobile');
-  if (missing.length){
-    btn.textContent = 'Add ' + missing[0] + ' ↑';
-    setTimeout(() => btn.textContent = 'Confirm booking →', 1800);
-    return;
-  }
-  if (document.getElementById('fCompany').value){ return; }   /* honeypot: bots fill it, people can't see it */
-  if (!/^(\+?44|0)[\d\s()-]{9,}$/.test(phone)){
-    btn.textContent = 'Check that mobile number ↑';
-    setTimeout(() => btn.textContent = 'Confirm booking →', 2200);
-    return;
-  }
-  btn.textContent = 'Confirming…';
-  const iso = dayISO(), time = state.time;
-  DB = await dbGet();                       /* fresh diary — no double-booking across devices */
-  if (DB.closedDays.includes(iso)){
-    buildDays(); renderTimes(); step();
-    btn.textContent = 'Neil just closed that day — pick another ↑';
-    setTimeout(() => btn.textContent = 'Confirm booking →', 2600);
-    return;
-  }
-  if (isTaken(iso, time)){
-    renderTimes(); step();
-    btn.textContent = 'That slot just went — pick another ↑';
-    setTimeout(() => btn.textContent = 'Confirm booking →', 2400);
-    return;
-  }
-  /* timestamp-based so two bookings can never share a reference — the old
-     length+random scheme collided constantly, and admin cancels by ref */
-  const ref = 'AES-' + Date.now().toString(36).slice(-4).toUpperCase() +
-              Math.floor(Math.random() * 36).toString(36).toUpperCase();
-  const booking = {ref, svc: state.svc, day: state.day, iso, time, name, phone, reg, model, ts: Date.now()};
-  DB.bookings.push(booking);
-  const saved = await dbPut(DB);
-  if (saved === 'taken'){
-    DB = await dbGet(); renderTimes(); step();
-    btn.textContent = 'That slot just went — pick another ↑';
-    setTimeout(() => btn.textContent = 'Confirm booking →', 2400);
-    return;
-  }
-  if (!saved){
-    fail('We couldn’t reach the diary just now, so this booking has NOT been saved. Call or WhatsApp and we’ll put you straight in.');
-    return;
-  }
-  if (BOOKING_WEBHOOK) fetch(BOOKING_WEBHOOK, {
-    method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({source: 'aesir-website', ...booking})
-  }).catch(() => {});
-  document.getElementById('doneRef').textContent = 'REF ' + ref;
-  document.getElementById('doneLine').textContent = state.day + ' · ' + time + ' — ' + state.svc;
-  typeInto(document.getElementById('doneSms'),
-    'Hi ' + name.split(' ')[0] + ' — you\u2019re booked in for ' + state.svc + ' on ' + state.day + ' at ' + time +
-    ' (ref ' + ref + '). Neil has this in the workshop diary. Pond Farm, Newyears Green Lane, UB9 6LX. ' +
-    'Need to change it? Call or WhatsApp 07956 658177.');
-  document.getElementById('wForm').style.display = 'none';
-  document.getElementById('wDone').style.display = 'block';
-  btn.textContent = 'Confirm booking →';
-  toast('Slot ' + time + ' locked in the live diary');
-};
-document.getElementById('wRetry').onclick = () => {
-  document.getElementById('wFail').style.display = 'none';
-  document.getElementById('wForm').style.display = 'block';
-};
-document.getElementById('wAgain').onclick = async () => {
-  document.getElementById('wDone').style.display = 'none';
-  document.getElementById('wForm').style.display = 'block';
-  state.svc = state.day = state.time = null;
-  [...document.querySelectorAll('#widget .chip')].forEach(c => c.classList.remove('sel'));
-  ['fName','fPhone','fReg','fModel'].forEach(id => document.getElementById(id).value = '');
-  DB = await dbGet(); buildDays(); renderTimes(); step();
-};
+  document.getElementById('wRetry').onclick = () => {
+    document.getElementById('wFail').style.display = 'none';
+    document.getElementById('wForm').style.display = 'block';
+  };
+  document.getElementById('wAgain').onclick = async () => {
+    document.getElementById('wDone').style.display = 'none';
+    document.getElementById('wForm').style.display = 'block';
+    state.svc = state.day = state.time = null;
+    [...document.querySelectorAll('#widget .chip')].forEach(c => c.classList.remove('sel'));
+    ['fName','fPhone','fReg','fModel'].forEach(id => document.getElementById(id).value = '');
+    DB = await dbGet(); buildDays(); renderTimes(); step();
+  };
+})();
 
 /* ============ SERVICES INDEX ============
    Pointing at a line changes the plate. Keyboard focus does the same, so
