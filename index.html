@@ -96,7 +96,7 @@
 #cine.rolling .bar.bot{transform:translateY(72%)}
 #cine.out .bar.top{transform:translateY(-101%)}
 #cine.out .bar.bot{transform:translateY(101%)}
-#cine .cap{position:absolute;left:50%;bottom:15.5vh;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.3vw,12px);letter-spacing:.42em;text-transform:uppercase;color:#cfd8e8;white-space:nowrap;opacity:0;transition:opacity .9s .6s}
+#cine .cap{position:absolute;left:50%;bottom:15.5vh;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.3vw,12px);letter-spacing:.42em;text-transform:uppercase;color:#cfd8e8;white-space:nowrap;opacity:0;transition:opacity .7s .15s}
 @media(max-width:640px){#cine .cap{white-space:normal;text-align:center;width:82vw;letter-spacing:.24em;line-height:2;bottom:17vh}}
 #cine.rolling .cap{opacity:1}
 #cine.out .cap{opacity:0;transition:opacity .3s}
@@ -335,7 +335,6 @@ section.has-gw{overflow:hidden}
     <small>AUTOMOTIVE LTD</small>
   </div>
   <div class="ui">
-    <button id="cineSound">🔇 Sound</button>
     <button id="cineSkip">Skip ▸</button>
   </div>
 </div>
@@ -731,44 +730,21 @@ section.has-gw{overflow:hidden}
   cine.hidden = false;
   sessionStorage.setItem('aesir_intro', '1');
 
-  let done = false, audio = null, soundOn = false;
-  function engineSound(){
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const out = ctx.createGain(); out.gain.value = 0; out.connect(ctx.destination);
-    [55, 82.5, 110].forEach((f, i) => {
-      const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f;
-      const g = ctx.createGain(); g.gain.value = [0.5, 0.28, 0.14][i];
-      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 320;
-      o.connect(g); g.connect(lp); lp.connect(out);
-      o.frequency.linearRampToValueAtTime(f * 1.9, ctx.currentTime + 2.6);
-      o.frequency.linearRampToValueAtTime(f * 1.2, ctx.currentTime + 4.2);
-      o.start();
-    });
-    out.gain.linearRampToValueAtTime(0.16, ctx.currentTime + 0.7);
-    out.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 3.8);
-    out.gain.linearRampToValueAtTime(0, ctx.currentTime + 4.8);
-    return ctx;
-  }
-  document.getElementById('cineSound').onclick = e => {
-    e.stopPropagation();
-    if (!soundOn){ soundOn = true; audio = engineSound(); e.target.textContent = '🔊 Sound'; e.target.classList.add('on'); }
-  };
-
+  let done = false;
   function finish(){
     if (done) return; done = true;
     cine.classList.add('out');
     document.body.classList.add('ready');
-    if (audio) try { audio.close(); } catch(e){}
     setTimeout(() => cine.remove(), 1300);
   }
   document.getElementById('cineSkip').onclick = finish;
 
-  /* open on the film itself: letterbox from frame one, the writing arrives a beat later */
+  /* fast open: letterbox from frame one, wordmark almost immediately, into the site ~2s */
   cine.classList.add('rolling');
   startVideo();
   vid.addEventListener('canplay', startVideo, {once:true});
-  setTimeout(() => document.getElementById('cineMark').classList.add('in'), 1900);
-  if (!hold) setTimeout(finish, 5400);
+  setTimeout(() => document.getElementById('cineMark').classList.add('in'), 350);
+  if (!hold) setTimeout(finish, 2200);
 })();
 
 /* scroll progress */

@@ -248,3 +248,12 @@ section>.wrap{position:relative;z-index:1}
 
 /* keyboard focus */
 :focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+
+/* floating WhatsApp button */
+.wa-fab{position:fixed;right:22px;bottom:24px;z-index:1500;width:58px;height:58px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px -8px rgba(37,211,102,.55);transition:transform .25s cubic-bezier(.2,.7,.2,1)}
+.wa-fab:hover{transform:scale(1.1)}
+.wa-fab svg{width:30px;height:30px;fill:#fff}
+.wa-fab::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(37,211,102,.5);animation:waPulse 2.4s ease-out infinite}
+@keyframes waPulse{0%{transform:scale(.8);opacity:1}70%{transform:scale(1.25);opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.wa-fab::before{animation:none}}
+@media(max-width:960px){.wa-fab{bottom:84px;right:16px;width:54px;height:54px}}
