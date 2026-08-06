@@ -25,6 +25,20 @@
 @media(max-width:960px){.g-grid{grid-template-columns:1fr 1fr;grid-auto-rows:190px}}
 @media(max-width:560px){.g-grid{grid-template-columns:1fr;grid-auto-rows:240px}.g-grid .shot:nth-child(1),.g-grid .shot:nth-child(4){grid-row:span 1}}
 .g-cta{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+/* evidence cards — the claims, with the photo that proves each one */
+.ev{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:56px}
+.ev-card{background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.ev-card::before{content:"";position:absolute;left:0;top:0;height:3px;width:0;background:linear-gradient(90deg,var(--m1),var(--m2),var(--m3));transition:width .4s;z-index:2}
+.ev-card:hover::before{width:100%}
+.ev-img{height:235px;overflow:hidden;cursor:pointer}
+.ev-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.92);transition:transform .6s ease}
+.ev-card:hover .ev-img img{transform:scale(1.05)}
+.ev-txt{padding:20px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.ev-txt b.t{text-transform:uppercase;font-size:14.5px;letter-spacing:.03em;color:var(--ink)}
+.ev-txt p{font-size:13.5px;color:var(--mut);line-height:1.65;margin:0}
+.ev-txt p em{font-style:normal;color:var(--ink)}
+.ev-src{margin-top:auto;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#5b8aa8}
+@media(max-width:760px){.ev{grid-template-columns:1fr}.ev-img{height:200px}}
 </style>
 </head>
 <body>
@@ -50,31 +64,77 @@
     <span class="crumb"><a href="index.html">HOME</a> / GALLERY</span>
     <div class="kicker">Straight off the bench</div>
     <h1>The Work</h1>
-    <p class="lead">Every photo below is a real job from the Pond Farm workshop — engines out, heads off, cars tested and handed back. No stock photos, no staging.</p>
+    <p class="lead">Every photo below comes straight from the workshop's own Instagram, <a href="https://www.instagram.com/aesir.automotive/" target="_blank" rel="noopener" style="color:var(--sky)">@aesir.automotive</a> — real jobs at Pond Farm, photographed as they happened. No stock photos, no staging. The site makes claims; this page is the proof.</p>
   </div>
 </header>
 
 <section class="g-wrap">
   <div class="wrap">
-    <div class="kicker rv">Notable jobs</div>
-    <div class="jobs rv" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:44px">
-      <div style="background:var(--panel);border:1px solid var(--line);padding:22px"><b style="text-transform:uppercase;font-size:14px">E60 M5 Touring — S85 V10 bottom end</b><p style="font-size:13.5px;color:var(--mut);margin-top:6px">Big-end bearings replaced on BMW's F1-derived V10 — "close shave or what?"</p></div>
-      <div style="background:var(--panel);border:1px solid var(--line);padding:22px"><b style="text-transform:uppercase;font-size:14px">Rolls-Royce Ghost — oil leaks + Spirit of Ecstasy</b><p style="font-size:13.5px;color:var(--mut);margin-top:6px">Leaks traced and sealed; the retracting mascot mechanism repaired to full working order.</p></div>
-      <div style="background:var(--panel);border:1px solid var(--line);padding:22px"><b style="text-transform:uppercase;font-size:14px">Ferrari F430 — multiple misfires</b><p style="font-size:13.5px;color:var(--mut);margin-top:6px">The diagnosis other garages couldn't land. Fixed, tested, returned.</p></div>
-      <div style="background:var(--panel);border:1px solid var(--line);padding:22px"><b style="text-transform:uppercase;font-size:14px">Z3 M Coupé — S50B32 rebuild</b><p style="font-size:13.5px;color:var(--mut);margin-top:6px">Engine out, rebuilt, refitted — "fired straight up, and ran sweet from the get go."</p></div>
+    <div class="kicker rv">The claims, with the proof</div>
+    <div class="ev rv">
+      <div class="ev-card">
+        <div class="ev-img" data-cursor="VIEW"><img src="img/bearings.jpg" alt="All twenty S85 V10 big-end bearing shells laid out on the bench" loading="lazy"></div>
+        <div class="ev-txt">
+          <b class="t">E60 M5 Touring — S85 V10 bottom end</b>
+          <p>The site says <em>engines most garages won't open are rebuilt here</em>. This is what that looks like: all the big-end shells out of BMW's F1-derived V10, laid out in firing order. The bronze showing through on the right-hand set is the bearing overlay running out — caught before it scored the crank. Neil's own caption: <em>"close shave or what?"</em></p>
+          <span class="ev-src">As posted · @aesir.automotive · Mar 2025</span>
+        </div>
+      </div>
+      <div class="ev-card">
+        <div class="ev-img" data-cursor="VIEW"><img src="img/z3-workshop.jpg" alt="Z3 M Coupé on the ramp with its S50 engine out on the workshop floor" loading="lazy"></div>
+        <div class="ev-txt">
+          <b class="t">Z3 M Coupé — S50B32 engine-out rebuild</b>
+          <p>Not a spark-plug service: the M Coupé in the air with its S50 straight-six <em>out of the car</em> in the foreground. Stripped, rebuilt and refitted at Pond Farm — <em>"fired straight up, and ran sweet from the get go."</em></p>
+          <span class="ev-src">As posted · @aesir.automotive · Nov 2023</span>
+        </div>
+      </div>
+      <div class="ev-card">
+        <div class="ev-img" data-cursor="VIEW"><img src="img/s50-block.jpg" alt="Freshly machined BMW straight-six block, Ferrari F430 in the background" loading="lazy"></div>
+        <div class="ev-txt">
+          <b class="t">Machining, not just fitting parts</b>
+          <p>A straight-six block back from machining — deck skimmed flat, bores honed to a mirror. One frame, two claims proved: proper engine machining on the bench, and the red <em>Ferrari F430 waiting on the ramp behind it</em>.</p>
+          <span class="ev-src">As posted · @aesir.automotive · Nov 2023</span>
+        </div>
+      </div>
+      <div class="ev-card">
+        <div class="ev-img" data-cursor="VIEW"><img src="img/f430.jpg" alt="Red Ferrari F430 Spider inside the Æsir workshop" loading="lazy"></div>
+        <div class="ev-txt">
+          <b class="t">Ferrari F430 — the diagnosis others couldn't land</b>
+          <p>The F430 Spider inside the workshop, doors up. It arrived with <em>multiple misfires other garages couldn't trace</em> — and left fixed. Proper diagnosis doesn't care about the badge.</p>
+          <span class="ev-src">As posted · @aesir.automotive · Nov 2023</span>
+        </div>
+      </div>
+      <div class="ev-card">
+        <div class="ev-img" data-cursor="VIEW"><img src="img/spirit-rolls.jpg" alt="Rolls-Royce grille and gold Spirit of Ecstasy housing on the bench" loading="lazy"></div>
+        <div class="ev-txt">
+          <b class="t">Rolls-Royce Ghost — Spirit of Ecstasy repair</b>
+          <p>The gold-finished housing for the retracting mascot mechanism, off the car and on the bench next to the Ghost's grille. The same visit traced and sealed its oil leaks — <em>BMW-group engineering at its grandest</em>, handled at Pond Farm.</p>
+          <span class="ev-src">As posted · @aesir.automotive</span>
+        </div>
+      </div>
+      <div class="ev-card">
+        <div class="ev-img" data-cursor="VIEW"><img src="img/workshop.jpg" alt="Inside the Æsir workshop — two-post lifts, blast cabinet and tool wall" loading="lazy"></div>
+        <div class="ev-txt">
+          <b class="t">A proper workshop, not an arch with a jack</b>
+          <p>Pond Farm from the inside: two-post lifts, a blast cabinet for cleaning castings, press, and a wall of Snap-on boxes. This is the floor the engines above were rebuilt on — the reason engine-out work happens <em>in-house</em>, not farmed out.</p>
+          <span class="ev-src">As posted · @aesir.automotive · Oct 2022</span>
+        </div>
+      </div>
     </div>
     <div class="kicker rv">The photo record</div>
     <div class="g-grid">
 <div class="shot rv" data-cursor="VIEW"><img src="img/z3-workshop.jpg" alt="Z3 M COUPÉ — S50B32 rebuilt — fired straight up" loading="lazy"><span class="cap"><b>Z3 M COUPÉ</b> · S50B32 rebuilt — fired straight up</span></div>
 <div class="shot rv" data-cursor="VIEW"><img src="img/v10-engine.jpg" alt="E60 M5 TOURING — S85 V10 in the bay" loading="lazy"><span class="cap"><b>E60 M5 TOURING</b> · S85 V10 in the bay</span></div>
-<div class="shot rv" data-cursor="VIEW"><img src="img/ghost-block.jpg" alt="ROLLS-ROYCE GHOST — oil leaks, sorted" loading="lazy"><span class="cap"><b>ROLLS-ROYCE GHOST</b> · oil leaks, sorted</span></div>
+<div class="shot rv" data-cursor="VIEW"><img src="img/s50-block.jpg" alt="S50 STRAIGHT-SIX — block decked and honed" loading="lazy"><span class="cap"><b>S50 STRAIGHT-SIX</b> · decked &amp; honed, F430 behind</span></div>
 <div class="shot rv" data-cursor="VIEW"><img src="img/f430.jpg" alt="FERRARI F430 — multiple misfires, diagnosed" loading="lazy"><span class="cap"><b>FERRARI F430</b> · multiple misfires, diagnosed</span></div>
 <div class="shot rv" data-cursor="VIEW"><img src="img/bearings.jpg" alt="E60 M5 — big-end bearings — close shave" loading="lazy"><span class="cap"><b>E60 M5</b> · big-end bearings — close shave</span></div>
-<div class="shot rv" data-cursor="VIEW"><img src="img/m20-head.jpg" alt="M20 STRAIGHT-SIX — head rebuild" loading="lazy"><span class="cap"><b>M20 STRAIGHT-SIX</b> · head rebuild</span></div>
-<div class="shot rv" data-cursor="VIEW"><img src="img/m10-head.jpg" alt="M10 FOUR — classic head work" loading="lazy"><span class="cap"><b>M10 FOUR</b> · classic head work</span></div>
+<div class="shot rv" data-cursor="VIEW"><img src="img/workshop.jpg" alt="THE WORKSHOP — Pond Farm, Uxbridge" loading="lazy"><span class="cap"><b>THE WORKSHOP</b> · Pond Farm, Uxbridge</span></div>
+<div class="shot rv" data-cursor="VIEW"><img src="img/m20-head.jpg" alt="STRAIGHT-SIX HEAD — skimmed and rebuilt" loading="lazy"><span class="cap"><b>M20 STRAIGHT-SIX</b> · head skimmed &amp; rebuilt</span></div>
+<div class="shot rv" data-cursor="VIEW"><img src="img/m10-head.jpg" alt="M10 FOUR — classic head work, manifold off" loading="lazy"><span class="cap"><b>M10 FOUR</b> · classic head work</span></div>
 <div class="shot rv" data-cursor="VIEW"><img src="img/e30-bay.jpg" alt="E30 CLASSIC — M20B25 feeling the heat" loading="lazy"><span class="cap"><b>E30 CLASSIC</b> · M20B25 feeling the heat</span></div>
+<div class="shot rv" data-cursor="VIEW"><img src="img/spirit-rolls.jpg" alt="ROLLS-ROYCE — Spirit of Ecstasy repair" loading="lazy"><span class="cap"><b>ROLLS-ROYCE</b> · Spirit of Ecstasy repair</span></div>
 <div class="shot rv" data-cursor="VIEW"><img src="img/i8.jpg" alt="BMW i8 — “what a car!!!!”" loading="lazy"><span class="cap"><b>BMW i8</b> · “what a car!!!!”</span></div>
-<div class="shot rv" data-cursor="VIEW"><img src="img/z3-sunset.jpg" alt="TESTED & READY — “see you in 600 miles yeah?!”" loading="lazy"><span class="cap"><b>TESTED & READY</b> · “see you in 600 miles yeah?!”</span></div>
+<div class="shot rv" data-cursor="VIEW"><img src="img/z3-sunset.jpg" alt="TESTED & READY — “see you in 600 miles yeah?!”" loading="lazy"><span class="cap"><b>TESTED &amp; READY</b> · “see you in 600 miles yeah?!”</span></div>
 <div class="shot rv" data-cursor="VIEW"><img src="img/ferrari-classic.jpg" alt="75 YEARS OF FERRARI — Silverstone Classic" loading="lazy"><span class="cap"><b>75 YEARS OF FERRARI</b> · Silverstone Classic</span></div>
     </div>
     <div class="g-cta rv">
@@ -107,13 +167,18 @@
 <script src="js/shared.js"></script>
 <script>
 (() => {
-  const shots = [...document.querySelectorAll('.shot')];
+  /* one lightbox over both the evidence cards and the grid */
+  const shots = [...document.querySelectorAll('.shot, .ev-img')].map(el => ({
+    el,
+    src: () => el.querySelector('img').src,
+    cap: () => el.querySelector('.cap')?.innerHTML || '<b>' + (el.closest('.ev-card')?.querySelector('.t')?.textContent || '') + '</b>'
+  }));
   const lb = document.getElementById('lb'), img = document.getElementById('lbImg'), cap = document.getElementById('lbCap');
   let cur = 0;
   function show(i){ cur = (i + shots.length) % shots.length;
-    img.src = shots[cur].querySelector('img').src;
-    cap.innerHTML = shots[cur].querySelector('.cap').innerHTML; }
-  shots.forEach((s, i) => { s.style.cursor = 'pointer'; s.addEventListener('click', () => { show(i); lb.classList.add('open'); }); });
+    img.src = shots[cur].src();
+    cap.innerHTML = shots[cur].cap(); }
+  shots.forEach((s, i) => { s.el.style.cursor = 'pointer'; s.el.addEventListener('click', () => { show(i); lb.classList.add('open'); }); });
   const close = () => lb.classList.remove('open');
   lb.querySelector('.lb-x').onclick = close;
   lb.querySelector('.lb-prev').onclick = e => { e.stopPropagation(); show(cur - 1); };

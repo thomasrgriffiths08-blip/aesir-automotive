@@ -103,7 +103,7 @@
 #cine .mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;opacity:0;transform:scale(.96);transition:opacity 1s ease,transform 1.2s cubic-bezier(.2,.7,.2,1)}
 #cine .mark.in{opacity:1;transform:none}
 #cine.out .mark{opacity:0;transform:scale(1.05);transition:opacity .28s,transform .28s}
-#cine .mark .row{display:flex;align-items:center;gap:18px;font-weight:900;font-size:clamp(46px,9vw,116px);letter-spacing:.02em;color:#fff;text-transform:uppercase;text-shadow:0 10px 50px rgba(0,0,0,.7)}
+#cine .mark .row{display:flex;align-items:center;gap:0;font-weight:900;font-size:clamp(46px,9vw,116px);letter-spacing:.02em;color:#fff;text-transform:uppercase;text-shadow:0 10px 50px rgba(0,0,0,.7)}
 #cine .mark .row .mstripe{height:.72em}
 #cine .mark small{font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.2vw,12px);letter-spacing:.5em;text-transform:uppercase;color:#b9c4d8}
 #cine .ui{position:absolute;right:26px;bottom:5vh;display:flex;gap:10px;pointer-events:auto}
@@ -190,16 +190,7 @@ video::-webkit-media-controls{display:none!important}
 .feed-head .ig{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--mut);border:1px solid var(--line);padding:10px 18px;transition:.2s}
 .feed-head .ig:hover{color:var(--sky);border-color:var(--sky)}
 .feed-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:190px;gap:12px;margin-top:46px}
-.shot{position:relative;overflow:hidden;background:var(--panel)}
-.shot img{width:100%;height:100%;object-fit:cover;filter:saturate(.92);transition:transform .6s ease,filter .4s}
-.shot:hover img{transform:scale(1.06);filter:saturate(1.05)}
-.shot .cap{position:absolute;left:0;right:0;bottom:0;padding:30px 14px 12px;background:linear-gradient(transparent,rgba(5,7,10,.92));font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#dfe6f2;opacity:0;transform:translateY(6px);transition:.35s}
-.shot:hover .cap{opacity:1;transform:none}
-.shot .cap b{color:var(--sky)}
-.shot.tall{grid-row:span 2}
-.shot.wide{grid-column:span 2}
-.shot::before{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--m1),var(--m2),var(--m3));transition:width .35s;z-index:2}
-.shot:hover::before{width:100%}
+/* .shot tile styles live in css/site.css — shared with the gallery */
 
 /* ============ SYSTEMS ============ */
 .systems{padding:110px 0;background:
@@ -442,7 +433,7 @@ section.has-gw{overflow:hidden}
     <div class="feed-grid">
       <div class="shot tall rv" data-cursor="VIEW"><img src="img/z3-workshop.jpg" alt="Z3 M Coupé on the ramp, S50 engine out"><span class="cap"><b>Z3 M COUPÉ</b> · S50B32 fired straight up</span></div>
       <div class="shot rv" data-cursor="VIEW"><img src="img/v10-engine.jpg" alt="BMW S85 V10 engine bay" style="object-position:center 42%"><span class="cap"><b>E60 M5 TOURING</b> · S85 V10</span></div>
-      <div class="shot rv" data-cursor="VIEW"><img src="img/ghost-block.jpg" alt="Rolls-Royce Ghost engine block"><span class="cap"><b>ROLLS-ROYCE GHOST</b> · oil leaks, sorted</span></div>
+      <div class="shot rv" data-cursor="VIEW"><img src="img/s50-block.jpg" alt="BMW straight-six block freshly machined, Ferrari F430 behind"><span class="cap"><b>S50 STRAIGHT-SIX</b> · block back from machining</span></div>
       <div class="shot tall rv" data-cursor="VIEW"><img src="img/f430.jpg" alt="Ferrari F430 in the workshop"><span class="cap"><b>FERRARI F430</b> · multiple misfires</span></div>
       <div class="shot rv" data-cursor="VIEW"><img src="img/bearings.jpg" alt="E60 M5 big end bearings"><span class="cap"><b>E60 M5</b> · big ends — close shave</span></div>
       <div class="shot rv" data-cursor="VIEW"><img src="img/m20-head.jpg" alt="BMW M20 cylinder head"><span class="cap"><b>M20 STRAIGHT-SIX</b> · head rebuild</span></div>
@@ -557,7 +548,7 @@ section.has-gw{overflow:hidden}
 <section class="about" id="about">
   <div class="wrap about-grid">
     <div class="about-img rv">
-      <img src="img/z3-workshop.jpg" alt="The Æsir workshop — Z3 M Coupé and its S50 engine">
+      <img src="img/workshop.jpg" alt="Inside the Æsir workshop at Pond Farm — two-post lifts and tool wall">
       <span class="plate">THE WORKSHOP · <b>3 RAMPS</b> · POND FARM</span>
     </div>
     <div class="rv">
@@ -783,6 +774,8 @@ function chip(txt, group, key, onSel){
 const svcC = document.getElementById('svcChips'), dayC = document.getElementById('dayChips'), timeC = document.getElementById('timeChips');
 SERVICES.forEach(sv => svcC.appendChild(chip(sv, svcC, 'svc')));
 
+/* local-date ISO — toISOString() is UTC and mislabels the day just after midnight in BST */
+const isoLocal = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 function dayISO(){ const sel = [...dayC.children].find(c => c.classList.contains('sel')); return sel ? sel.dataset.iso : null; }
 function isTaken(iso, t){
   return DB.bookings.some(b => b.iso === iso && b.time === t) || (DB.blocked[iso] || []).includes(t);
@@ -792,8 +785,8 @@ function buildDays(){
   const kept = state.day; dayC.innerHTML = '';
   for (let d = new Date(), n = 0; dayC.children.length < 6 && n < 21; d.setDate(d.getDate() + 1)){
     n++; if (n === 1) continue;
-    if (d.getDay() === 0) continue;
-    const iso = d.toISOString().slice(0,10);
+    if (d.getDay() === 0 || d.getDay() === 6) continue; /* workshop hours are Mon–Fri */
+    const iso = isoLocal(d);
     if (DB.closedDays.includes(iso)) continue;
     const label = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
     const c = chip(label, dayC, 'day', renderTimes);

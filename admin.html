@@ -143,8 +143,8 @@ function render(){
   daysEl.innerHTML = '';
   for (let n = 0; n < 14; n++){
     const d = new Date(today); d.setDate(d.getDate() + n);
-    if (d.getDay() === 0) continue;
-    const iso = d.toISOString().slice(0,10);
+    if (d.getDay() === 0 || d.getDay() === 6) continue; /* Mon–Fri, matches the public widget */
+    const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     const closed = DB.closedDays.includes(iso);
     const blocked = DB.blocked[iso] || [];
     const dayBk = DB.bookings.filter(b => b.iso === iso);
