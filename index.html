@@ -518,11 +518,12 @@ section.has-gw{overflow:hidden}
             <input class="f-input" id="fPhone" placeholder="Mobile number" inputmode="tel" autocomplete="tel">
           </div>
           <div class="w-row" style="margin-top:12px">
-            <input class="f-input" id="fReg" placeholder="Reg  e.g. LX21 KVR" style="text-transform:uppercase">
-            <input class="f-input" id="fModel" placeholder="Car  e.g. 330d M Sport">
+            <input class="f-input" id="fReg" placeholder="Reg (optional)" style="text-transform:uppercase">
+            <input class="f-input" id="fModel" placeholder="Car (optional)  e.g. 330d">
           </div>
           <button class="btn w-cta" id="wSubmit">Confirm booking →</button>
-          <div class="w-note">NO PAYMENT TAKEN · SMS CONFIRMATION · FREE TO RESCHEDULE</div>
+          <div class="w-note">NO PAYMENT TAKEN · FREE TO RESCHEDULE</div>
+          <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--mut)">Hate forms? <a href="https://wa.me/447956658177?text=Hi%20Neil%20—%20can%20I%20book%20my%20car%20in%3F%20It%27s%20a%20" target="_blank" rel="noopener" style="color:#25D366;font-weight:700">WhatsApp Neil instead →</a></div>
         </div>
         <div class="w-success" id="wDone">
           <div class="tick">✓</div>
@@ -839,6 +840,12 @@ function renderTimes(){
   });
 }
 buildDays(); renderTimes();
+/* arriving from a service page pre-selects that service */
+const preSvc = new URLSearchParams(location.search).get('svc');
+if (preSvc){
+  const c = [...svcC.children].find(x => x.textContent === preSvc);
+  if (c) c.click();
+}
 dbGet().then(d => { DB = d; buildDays(); renderTimes(); });
 
 function step(){
