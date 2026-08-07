@@ -57,6 +57,54 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   }, {passive:true});
 })();
 
+/* ============ TRICOLOR PAGE TRANSITION ============
+   Sweeps the brand stripes across on the way out, and off again on arrival.
+   Skipped entirely under reduced-motion, and it never blocks navigation:
+   if the page is slow, the browser leaves before the animation finishes,
+   which is the correct priority. */
+(() => {
+  const wipe = document.createElement('div');
+  wipe.className = 'wipe-nav';
+  wipe.setAttribute('aria-hidden', 'true');
+  wipe.innerHTML = '<i></i><i></i><i></i>';
+  document.body.appendChild(wipe);
+
+  /* Arrival: only clear the panels off if we actually came from another page
+     on this site. On a fresh visit there was no sweep out, and flashing the
+     colours across for no reason would just look like a bug. */
+  if (sessionStorage.getItem('aesir_wipe')){
+    sessionStorage.removeItem('aesir_wipe');
+    wipe.classList.add('go');
+    requestAnimationFrame(() => {
+      wipe.classList.add('clear');
+      setTimeout(() => wipe.classList.remove('go', 'clear'), 760);
+    });
+  }
+
+  let leaving = false;
+  addEventListener('click', e => {
+    const a = e.target.closest('a[href]');
+    if (!a || leaving || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || a.target === '_blank') return;
+    const href = a.getAttribute('href');
+    if (!href || /^(https?:|tel:|mailto:|#)/.test(href)) return;
+    if (a.origin && a.origin !== location.origin) return;
+    /* a same-page anchor is not a navigation — let it scroll */
+    if (href.includes('#') && href.split('#')[0] === location.pathname.split('/').pop()) return;
+    e.preventDefault();
+    leaving = true;
+    sessionStorage.setItem('aesir_wipe', '1');   /* tells the next page to clear them off */
+    wipe.classList.remove('clear');
+    wipe.classList.add('go');
+    setTimeout(() => { location.href = href; }, 380);
+  });
+
+  /* coming back via the browser's back button restores the page from cache —
+     clear the panels or the visitor lands behind a wall of colour */
+  addEventListener('pageshow', e => {
+    if (e.persisted){ leaving = false; wipe.classList.remove('go', 'clear'); }
+  });
+})();
+
 /* floating WhatsApp button — pre-filled message straight to the workshop */
 (() => {
   const wa = document.createElement('a');

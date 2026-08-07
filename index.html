@@ -206,9 +206,9 @@ video::-webkit-media-controls{display:none!important}
   .svc-index{grid-template-columns:1fr;gap:0}
   .svc-stage{display:none}
   .svc-row{padding:18px 34px 18px 0;display:grid;grid-template-columns:74px 1fr;gap:18px;align-items:start}
-  /* the number rides the corner of the thumb like a plate, rather than
-     floating loose beside the description */
-  .svc-row .n{position:absolute;left:0;top:18px;z-index:2;background:rgba(8,9,12,.82);padding:3px 6px;font-size:9.5px;color:var(--acc)}
+  /* the number rides the corner of the thumb like a stamped plate — solid
+     backing so it stays legible over a busy photograph */
+  .svc-row .n{position:absolute;left:0;top:18px;z-index:2;background:var(--acc);color:#fff;padding:3px 6px;font-size:9.5px;font-weight:700;letter-spacing:.1em}
   .svc-row h3,.svc-row p{grid-column:2;min-width:0}  /* grid items default to min-width:auto and would overflow */
   .svc-row p{max-height:none;opacity:1;margin-top:8px;color:var(--mut);max-width:none}
   .svc-row .arrow{opacity:1;transform:none;top:18px}
@@ -364,6 +364,24 @@ section.has-gw{overflow:hidden}
 .map{border:1px solid var(--line);min-height:380px}
 .map iframe{width:100%;height:100%;min-height:380px;border:0;filter:invert(.92) grayscale(1) contrast(.95)}
 
+/* PHONES — the hero used to bottom-align a fixed-height, overflow-hidden box,
+   which on a 390x844 screen pushed "Independent" and the whole 5.0★ Google
+   badge off the top where they were clipped away entirely. The most important
+   screen on the site was showing neither the headline nor the strongest trust
+   signal. Now it flows downward from under the nav and grows to fit. */
+@media(max-width:860px){
+  .hero{height:auto;min-height:100svh;justify-content:flex-start;padding-top:88px}
+  .hero-inner{padding-bottom:30px}
+  .hero h1{font-size:clamp(32px,8.6vw,50px)}
+  .hero-sub{font-size:15.5px;margin-top:16px;max-width:34ch}
+  .g-badge{margin-bottom:20px;padding:8px 14px}
+  .hero-ctas{margin-top:24px}
+  .coords{margin-top:22px;font-size:10px;letter-spacing:.16em}
+  .hero-strip{margin-top:28px}
+  /* captions get too narrow to read in two columns at phone width */
+  .row-three{grid-template-columns:1fr}
+  .row-three .pl-img{height:240px}
+}
 @media(max-width:960px){
   .hero h1{font-size:clamp(36px,10vw,64px)}
   .hero-strip .wrap{grid-template-columns:1fr 1fr}
