@@ -965,6 +965,7 @@ const BOOKINGS_OPEN = true;
     const b = document.createElement('button');
     b.className = 'chip'; b.type = 'button'; b.textContent = txt;
     b.onclick = () => {
+      if (!state.svc && !state.day && !state.time) track('booking_started', {svc: key === 'svc' ? txt : undefined});
       [...group.children].forEach(c => c.classList.remove('sel'));
       b.classList.add('sel'); state[key] = txt; if (onSel) onSel(); step();
     };
@@ -1063,7 +1064,8 @@ const BOOKINGS_OPEN = true;
        length+random scheme collided constantly, and admin cancels by ref */
     const ref = 'AES-' + Date.now().toString(36).slice(-4).toUpperCase() +
                 Math.floor(Math.random() * 36).toString(36).toUpperCase();
-    const booking = {ref, svc: state.svc, day: state.day, iso, time, name, phone, reg, model, ts: Date.now()};
+    const booking = {ref, svc: state.svc, day: state.day, iso, time, name, phone, reg, model,
+                     visitor: typeof VISITOR_REF !== 'undefined' ? VISITOR_REF : '', ts: Date.now()};
     DB.bookings.push(booking);
     const saved = await dbPut(DB);
     if (saved === 'taken'){
@@ -1073,9 +1075,11 @@ const BOOKINGS_OPEN = true;
       return;
     }
     if (!saved){
+      track('booking_failed', {svc: state.svc});
       fail('We couldn’t reach the diary just now, so this booking has NOT been saved. Call or WhatsApp and we’ll put you straight in.');
       return;
     }
+    track('booking_confirmed', {svc: state.svc, day: state.day, time, booking_ref: ref});
     if (BOOKING_WEBHOOK) fetch(BOOKING_WEBHOOK, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({source: 'aesir-website', ...booking})

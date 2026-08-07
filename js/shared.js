@@ -31,6 +31,106 @@ const store = {
   set(k, v){ localStorage.setItem('aesir_' + k, JSON.stringify(v)); }
 };
 
+/* ============ ATTRIBUTION + EVENTS ============
+   Tom is paid commission on jobs that come through this site, so every contact
+   route carries a visitor reference (W-XXXX) and every meaningful action emits
+   an event. Two sinks, both optional and independent:
+   - ANALYTICS_ID: paste an Umami Cloud website id and every page gets a
+     cookieless dashboard (pageviews + the events below). No consent banner
+     needed, but update privacy.html per TRACKING.md when you switch it on.
+   - EVENT_WEBHOOK: paste the Google Apps Script URL from TRACKING.md and every
+     event also lands as a row in your own spreadsheet — clicks, bookings,
+     failures — with the visitor ref, so you can match WhatsApp messages
+     arriving on Neil's phone to the click that produced them. */
+const ANALYTICS_ID = '';
+const EVENT_WEBHOOK = '';
+
+/* one ref per visitor, stable across pages and days — the commission key */
+const VISITOR_REF = (() => {
+  let r = store.get('ref', null);
+  if (!r){
+    r = 'W-' + Date.now().toString(36).slice(-4).toUpperCase() +
+        Math.floor(Math.random() * 36).toString(36).toUpperCase();
+    store.set('ref', r);
+  }
+  return r;
+})();
+
+if (ANALYTICS_ID){
+  const s = document.createElement('script');
+  s.defer = true; s.src = 'https://cloud.umami.is/script.js';
+  s.setAttribute('data-website-id', ANALYTICS_ID);
+  document.head.appendChild(s);
+}
+
+function track(name, props){
+  const data = Object.assign({ref: VISITOR_REF, page: location.pathname.split('/').pop() || 'index'}, props || {});
+  try { if (window.umami && umami.track) umami.track(name, data); } catch(e){}
+  if (EVENT_WEBHOOK){
+    try {
+      navigator.sendBeacon(EVENT_WEBHOOK,
+        JSON.stringify({kind: 'event', name, ts: Date.now(), ...data}));
+    } catch(e){}
+  }
+}
+
+/* ============ DYNAMIC WHATSAPP MESSAGES ============
+   Every wa.me link on the site rebuilds its message at click time from what
+   the visitor has actually told us — name, car, reg, the service and slot they
+   picked in the booking widget, or the service page they're reading — and
+   stamps it with the visitor ref. A half-filled booking form still turns into
+   a complete, specific WhatsApp message instead of a generic one. */
+function waMessage(){
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const sel = id => { const el = document.getElementById(id); const c = el && el.querySelector('.chip.sel'); return c ? c.textContent.trim() : ''; };
+  const name = val('fName'), reg = val('fReg').toUpperCase(), model = val('fModel');
+  const svc = sel('svcChips'), day = sel('dayChips'), time = sel('timeChips');
+
+  let m = 'Hi Neil' + (name ? ', it’s ' + name.split(' ')[0] : '') + ' — ';
+  const car = model && reg ? model + ' (' + reg + ')' : (model || (reg ? 'car, reg ' + reg : ''));
+
+  const tag = '[web ' + VISITOR_REF + ']';
+  if (svc || car || day){
+    m += 'I’d like to book ' + (car ? 'my ' + car : 'my car') + ' in';
+    if (svc) m += ' for ' + svc;
+    if (day && time) m += ', ideally ' + day + ' at ' + time;
+    else if (day) m += ', ideally ' + day;
+    m += '. ' + tag;
+  } else {
+    /* Open-ended messages leave the visitor typing their car at the end, so
+       the ref goes mid-sentence — otherwise their words land after the tag. */
+    const ms = location.pathname.match(/services\/([a-z-]+)\.html/);
+    if (ms){
+      const label = ms[1] === 'mot-prep' ? 'MOT prep' : ms[1].replace(/-/g, ' ');
+      m += 'I’m after ' + label + ' for my car ' + tag + ' — it’s a ';
+    } else {
+      m += 'found you via the website ' + tag + '. My car is a ';
+    }
+  }
+  return 'https://wa.me/447956658177?text=' + encodeURIComponent(m);
+}
+
+/* wire every WhatsApp link, present or future, through the composer */
+addEventListener('click', e => {
+  const a = e.target.closest('a[href*="wa.me"]');
+  if (!a) return;
+  a.href = waMessage();
+  track('whatsapp_click', {
+    source: a.classList.contains('wa-fab') ? 'fab' :
+            a.closest('#widget') ? 'booking-widget' :
+            a.closest('#wFail') ? 'booking-fail' : 'page-link',
+    svc: (document.querySelector('#svcChips .chip.sel') || {textContent: ''}).textContent.trim() || undefined
+  });
+}, true);
+
+/* the calls matter to commission too */
+addEventListener('click', e => {
+  const a = e.target.closest('a[href^="tel:"]');
+  if (a) track('call_click', {});
+  const ig = e.target.closest('a[href*="instagram.com"]');
+  if (ig) track('ig_click', {});
+}, true);
+
 /* typewriter for sms bubbles */
 function typeInto(el, text, speed = 18){
   return new Promise(res => {
