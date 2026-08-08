@@ -24,6 +24,54 @@ switch the sinks on. Both are one-line pastes. Use either or both.
 
 ---
 
+## Getting bookings to Neil — the part that actually matters
+
+A booking that nobody sees is worse than no booking, because the customer
+believes they have an appointment. Neil spends the day under a car, so assume
+he is **not** refreshing an inbox. Use all three of these; they cost nothing
+extra and they fail independently.
+
+### 1. Email — the record
+Put his address in `NOTIFY` alongside yours:
+
+```javascript
+const NOTIFY = ['tom@yourdomain.com', 'neil@hisdomain.com'];
+```
+
+Two addresses, one line, comma between. **Re-deploy afterwards** (Deploy →
+Manage deployments → pencil → Version: New version → Deploy) or the change does
+nothing. The email is laid out to be read on a phone in three seconds — service
+and time on the first line, then name, number, car, and tap-to-call and
+WhatsApp links for the customer.
+
+> Ask Neil to mark the first one **"not spam"** and add your sending address to
+> his contacts. A brand-new sender emailing him daily is exactly what a spam
+> filter is built to catch.
+
+### 2. Calendar — the one that actually reaches him
+This is the important one. Set `CALENDAR_ID` and every booking becomes a real
+calendar event, in the correct time slot, on his phone, with alarms.
+
+- **Simplest:** set `CALENDAR_ID = 'primary'` — events go on the calendar of the
+  Google account running the script (yours). Then share that calendar with Neil:
+  [calendar.google.com](https://calendar.google.com) → hover the calendar →
+  ⋮ → "Settings and sharing" → "Share with specific people" → add his address.
+  He adds it once on his phone and every booking appears from then on.
+- **Tidier:** create a calendar called *Æsir bookings*, take its Calendar ID from
+  that same settings page (it looks like an email address), and paste that in.
+  Keeps workshop jobs out of your personal calendar.
+
+`JOB_MINUTES` sets how long each booking blocks out (90 by default — change it
+to whatever a typical job really takes). `ALERT_MINS` gives him a nudge the
+evening before and again 30 minutes ahead.
+
+### 3. WhatsApp — where most of them will arrive anyway
+Nothing to configure. Every WhatsApp message from the site is pre-written and
+lands on his phone with `[web W-XXXX]` in it. That is both the notification and
+your commission evidence in one.
+
+---
+
 ## The honest limit — read this first
 
 **No website can see whether someone actually pressed *send* inside WhatsApp.**
@@ -59,9 +107,17 @@ the moment a booking lands.**
    Replace the FOUR constants below. Nothing else needs changing. */
 
 const SHEET_ID  = 'PASTE-YOUR-SHEET-ID';       // the long code in the Sheet URL
-const NOTIFY    = ['you@example.com'];          // your email. Add Neil's LATER
+const NOTIFY    = ['you@example.com'];          // YOUR email. Add Neil's once tested
 const WRITE_KEY = 'change-me-write';            // must equal WEBHOOK_KEY in js/shared.js
 const READ_KEY  = 'change-me-read';             // typed into dashboard.html. DIFFERENT, 16+ chars
+
+/* Neil is under a car all day and will not be refreshing an inbox. Putting the
+   booking straight into a calendar means it lands on his phone, in the right
+   time slot, with an alert — which is how a one-man workshop actually works.
+   Leave as '' to switch it off; 'primary' uses this account's own calendar. */
+const CALENDAR_ID  = '';                        // e.g. 'primary', or a shared calendar's id
+const JOB_MINUTES  = 90;                        // how long to block out per booking
+const ALERT_MINS   = [60 * 14, 30];             // remind 14 hours before, and 30 minutes before
 
 const HEADERS = {
   Events:   ['When','Event','Visitor ref','Page','Source','Service','Booking ref'],
@@ -95,15 +151,52 @@ function doPost(e) {
       tab(ss, 'Bookings').appendRow([when, d.ref || '', d.visitor || '', d.svc || '',
         d.day || '', d.iso || '', d.time || '', d.name || '', d.phone || '',
         d.reg || '', d.model || '', d.source || '']);
+      const car = [d.model, d.reg].filter(String).join(' \u00b7 ') || 'car not given';
+      const when = d.day + ' at ' + d.time;
+      const digits = String(d.phone).replace(/[^0-9]/g, '');
+
       try {
-        MailApp.sendEmail(NOTIFY.join(','),
-          'BOOKING ' + d.ref + ' — ' + d.day + ' ' + d.time + ' — ' + d.svc,
-          d.name + ' · ' + d.phone + (d.model ? ' · ' + d.model : '') +
-          (d.reg ? ' · ' + d.reg : '') + '\nVisitor ref: ' + (d.visitor || '—') +
-          '\n\nIt is already in the live diary. This email is the notification.');
+        MailApp.sendEmail({
+          to: NOTIFY.join(','),
+          subject: 'BOOKING \u2014 ' + when + ' \u2014 ' + d.svc + ' \u2014 ' + d.name,
+          body: [
+            d.svc.toUpperCase() + '   ' + when,
+            '',
+            'Customer : ' + d.name,
+            'Phone    : ' + d.phone,
+            'Car      : ' + car,
+            '',
+            'Call:      tel:' + String(d.phone).replace(/[^0-9+]/g, ''),
+            'WhatsApp:  https://wa.me/' + digits.replace(/^0/, '44'),
+            '',
+            'Booking ref ' + d.ref + '  |  website visitor ' + (d.visitor || '-'),
+            'Already held in the live diary at /admin.html - this email is the alert.'
+          ].join('\n')
+        });
       } catch (mailErr) {
-        // The row matters more than the email — never lose the commission record
+        // The row matters more than the email - never lose the commission record
         console.error('mail failed: ' + mailErr);
+      }
+
+      // ...and put it in a calendar, which is what actually reaches a mechanic
+      try {
+        if (CALENDAR_ID && d.iso && d.time) {
+          const cal = CALENDAR_ID === 'primary'
+            ? CalendarApp.getDefaultCalendar()
+            : CalendarApp.getCalendarById(CALENDAR_ID);
+          if (cal) {
+            const start = new Date(d.iso + 'T' + d.time + ':00');
+            const end   = new Date(start.getTime() + JOB_MINUTES * 60000);
+            const ev = cal.createEvent(d.svc + ' - ' + d.name + ' (' + car + ')', start, end, {
+              description: 'Phone: ' + d.phone + '\nCar: ' + car +
+                           '\nBooking ref: ' + d.ref + '\nBooked online via the website.',
+              location: '3d Pond Farm, New Years Green Lane, Harefield, Uxbridge UB9 6LX'
+            });
+            ALERT_MINS.forEach(m => ev.addPopupReminder(m));
+          }
+        }
+      } catch (calErr) {
+        console.error('calendar failed: ' + calErr);
       }
     } else {
       return ContentService.createTextOutput('ignored');   // unknown kind
