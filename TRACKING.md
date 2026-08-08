@@ -80,9 +80,14 @@ function doPost(e) {
 }
 
 // Feeds dashboard.html. Same URL, with ?summary=1
+// Supports ?callback=fn so the dashboard can fall back to JSONP if a plain
+// cross-origin fetch is ever blocked.
 function doGet(e) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
-  const rows = n => ss.getSheetByName(n).getDataRange().getValues();
+  const rows = name => {
+    const sh = ss.getSheetByName(name);
+    return sh ? sh.getDataRange().getValues() : [];   // missing tab != crash
+  };
   const ev = rows('Events').map(r => ({
     ts: r[0], name: r[1], ref: r[2], page: r[3], source: r[4], svc: r[5]
   })).filter(x => x.ts instanceof Date);
@@ -90,11 +95,25 @@ function doGet(e) {
     ts: r[0], ref: r[1], visitor: r[2], svc: r[3], day: r[4], time: r[5],
     name: r[6], phone: r[7], reg: r[8], model: r[9]
   })).filter(x => x.ts instanceof Date);
-  return ContentService
-    .createTextOutput(JSON.stringify({events: ev, bookings: bk}))
+
+  const payload = JSON.stringify({events: ev, bookings: bk});
+  const cb = e && e.parameter && e.parameter.callback;
+  if (cb) {
+    return ContentService.createTextOutput(cb + '(' + payload + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(payload)
     .setMimeType(ContentService.MimeType.JSON);
 }
 ```
+
+> **Why `text/plain` on the website's side:** the booking POST and the event
+> beacon both send their JSON with a `text/plain` content type. That is
+> deliberate. An `application/json` content type makes the browser send a CORS
+> preflight `OPTIONS` request first, and Apps Script web apps do not answer
+> `OPTIONS` — so the request would be blocked and the notification would
+> silently never arrive. Apps Script reads the body from `e.postData.contents`
+> regardless of the declared type, so nothing is lost.
 
 3. Deploy → New deployment → type **Web app** → execute as **Me**, access
    **Anyone**. Copy the `/exec` URL.

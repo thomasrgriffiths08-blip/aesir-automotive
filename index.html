@@ -1113,8 +1113,12 @@ const BOOKINGS_OPEN = true;
       return;
     }
     track('booking_confirmed', {svc: state.svc, day: state.day, time, booking_ref: ref});
+    /* text/plain, not application/json: a JSON content-type triggers a CORS
+       preflight, and Google Apps Script web apps do not answer OPTIONS — the
+       booking notification would silently never arrive. The body is still JSON
+       and Apps Script reads it from e.postData.contents either way. */
     if (BOOKING_WEBHOOK) fetch(BOOKING_WEBHOOK, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+      method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'},
       body: JSON.stringify({source: 'aesir-website', ...booking})
     }).catch(() => {});
     document.getElementById('doneRef').textContent = 'REF ' + ref;

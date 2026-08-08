@@ -133,10 +133,31 @@ async function boot(){
   });
   if (!LEDGER_URL){ document.getElementById('setup').style.display = 'block'; render(); return; }
   try {
-    const r = await fetch(LEDGER_URL + '?summary=1', {cache: 'no-store'});
-    DATA = await r.json();
-  } catch(e){ document.getElementById('setup').style.display = 'block'; }
+    DATA = await load();
+  } catch(e){
+    document.getElementById('setup').style.display = 'block';
+    document.querySelector('#setup h3').textContent = 'Could not reach the ledger';
+  }
   render();
+}
+
+/* Apps Script normally answers a cross-origin GET fine, but if the redirect to
+   googleusercontent.com ever fails CORS the fetch throws and the page would be
+   blank. JSONP has no such constraint, so it's the fallback rather than the
+   thing you debug at 11pm. */
+function load(){
+  return fetch(LEDGER_URL + '?summary=1', {cache: 'no-store'})
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(() => new Promise((resolve, reject) => {
+      const cb = 'aesirLedger' + Date.now().toString(36);
+      const t = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 12000);
+      function cleanup(){ clearTimeout(t); delete window[cb]; s.remove(); }
+      window[cb] = d => { cleanup(); resolve(d); };
+      const s = document.createElement('script');
+      s.src = LEDGER_URL + '?summary=1&callback=' + cb;
+      s.onerror = () => { cleanup(); reject(new Error('jsonp failed')); };
+      document.head.appendChild(s);
+    }));
 }
 
 const within = ts => (Date.now() - new Date(ts).getTime()) / 86400000 <= DAYS;
