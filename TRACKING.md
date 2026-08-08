@@ -78,15 +78,35 @@ function doPost(e) {
   }
   return ContentService.createTextOutput('ok');
 }
+
+// Feeds dashboard.html. Same URL, with ?summary=1
+function doGet(e) {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const rows = n => ss.getSheetByName(n).getDataRange().getValues();
+  const ev = rows('Events').map(r => ({
+    ts: r[0], name: r[1], ref: r[2], page: r[3], source: r[4], svc: r[5]
+  })).filter(x => x.ts instanceof Date);
+  const bk = rows('Bookings').map(r => ({
+    ts: r[0], ref: r[1], visitor: r[2], svc: r[3], day: r[4], time: r[5],
+    name: r[6], phone: r[7], reg: r[8], model: r[9]
+  })).filter(x => x.ts instanceof Date);
+  return ContentService
+    .createTextOutput(JSON.stringify({events: ev, bookings: bk}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
 ```
 
 3. Deploy → New deployment → type **Web app** → execute as **Me**, access
    **Anyone**. Copy the `/exec` URL.
-4. Paste that URL into **both**:
+4. Paste that URL into **all three**:
    - `EVENT_WEBHOOK` at the top of `js/shared.js`
    - `BOOKING_WEBHOOK` at the top of the booking script in `index.html`
-5. Commit and push. Done — bookings email you both instantly and everything
-   accumulates in the sheet.
+   - `LEDGER_URL` at the top of the script in `dashboard.html`
+5. Commit and push. Done — bookings email you both instantly, everything
+   accumulates in the sheet, and **`/dashboard.html` (PIN 8177) becomes your
+   read-out**: a visitors → started → booked → WhatsApp → call funnel with
+   conversion percentages, the commission ledger, and the last 60 contact
+   clicks with their visitor refs. That page is where you look at all of this.
 
 **This also solves "I need to know when jobs go through"** for online bookings:
 the email *is* the notification, and it closes the biggest operational gap in

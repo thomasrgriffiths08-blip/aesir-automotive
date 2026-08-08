@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Performance — Æsir Automotive</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<style>
+body{padding-bottom:60px}
+.gate{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;padding:24px}
+.gate p{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
+.pin-row{display:flex;gap:12px}
+.pin-row input{width:56px;height:64px;background:var(--panel);border:1.5px solid var(--line);color:var(--ink);font-size:26px;font-weight:800;text-align:center;outline:none;border-radius:6px;font-family:'JetBrains Mono',monospace}
+.pin-row input:focus{border-color:var(--acc)}
+.gate .err{color:#ff5b64;font-size:12px;height:16px;font-family:'JetBrains Mono',monospace}
+.dash{max-width:1080px;margin:0 auto;padding:96px 20px 40px}
+.d-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.range{display:flex;gap:8px}
+.range button{background:none;border:1px solid var(--line);color:var(--mut);font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:8px 13px;cursor:pointer;transition:.15s}
+.range button.on{border-color:var(--acc);color:var(--acc)}
+.funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:26px 0}
+.fcell{background:var(--panel);padding:18px 16px}
+.fcell b{display:block;font-size:32px;font-weight:900;color:var(--ink);line-height:1}
+.fcell span{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-top:8px}
+.fcell i{display:block;font-style:normal;font-size:11px;color:var(--acc);margin-top:6px;font-weight:700}
+.bar{height:4px;background:var(--acc);margin-top:12px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+h2.sec{font-size:15px;letter-spacing:.06em;margin:36px 0 14px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:10px 12px;border-bottom:1px solid var(--line);font-weight:500}
+td{padding:11px 12px;border-bottom:1px solid var(--line);color:var(--mut)}
+td b{color:var(--ink)}
+tr:hover td{background:var(--panel)}
+.ref{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--acc)}
+.tagged{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;background:rgba(232,68,58,.14);color:var(--acc);padding:3px 7px}
+.setup{background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--acc);padding:24px;margin-top:30px}
+.setup h3{font-size:15px;text-transform:uppercase;margin-bottom:12px}
+.setup p,.setup li{color:var(--mut);font-size:14px;line-height:1.65}
+.setup ol{margin:10px 0 0 18px}
+.setup code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink);background:var(--bg2);padding:2px 6px}
+.muted{color:var(--dim);font-size:12.5px;margin-top:8px}
+@media(max-width:860px){.funnel{grid-template-columns:1fr 1fr}.dash{padding-top:80px}}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <a class="logo"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>WEBSITE&nbsp;STATS</small></span></a>
+  <p>Enter PIN</p>
+  <div class="pin-row" id="pinRow">
+    <input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1">
+  </div>
+  <div class="err" id="pinErr"></div>
+</div>
+
+<nav class="site solid">
+  <div class="nav-in">
+    <a class="logo" href="index.html"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>AUTOMOTIVE&nbsp;LTD</small></span></a>
+    <span class="nav-phone" style="margin-left:auto">WEBSITE PERFORMANCE</span>
+  </div>
+</nav>
+
+<main class="dash">
+  <div class="d-head">
+    <div>
+      <div class="sec-meta" style="margin-bottom:14px;border:0;padding:0"><span class="sec-n">§</span><span class="sec-label">What the website is producing</span></div>
+      <h1 style="font-size:clamp(28px,4vw,44px)">Performance</h1>
+    </div>
+    <div class="range" id="range">
+      <button data-days="7">7 days</button>
+      <button data-days="30" class="on">30 days</button>
+      <button data-days="90">90 days</button>
+      <button data-days="9999">All</button>
+    </div>
+  </div>
+
+  <div class="funnel" id="funnel"></div>
+  <p class="muted" id="rate"></p>
+
+  <h2 class="sec">Bookings — the commission ledger</h2>
+  <div style="overflow-x:auto"><table id="bookings"><thead><tr>
+    <th>When</th><th>Ref</th><th>Visitor</th><th>Service</th><th>Slot</th><th>Customer</th><th>Car</th>
+  </tr></thead><tbody></tbody></table></div>
+
+  <h2 class="sec">Contact clicks — who reached out and how</h2>
+  <div style="overflow-x:auto"><table id="events"><thead><tr>
+    <th>When</th><th>Action</th><th>Visitor</th><th>From</th><th>Page</th>
+  </tr></thead><tbody></tbody></table></div>
+
+  <div class="setup" id="setup" style="display:none">
+    <h3>Not connected yet</h3>
+    <p>This page is reading from nothing because <code>EVENT_WEBHOOK</code> hasn't been set. Ten minutes fixes it:</p>
+    <ol>
+      <li>Follow <b>TRACKING.md</b> to deploy the Google Apps Script and get its <code>/exec</code> URL.</li>
+      <li>Paste that URL into <code>LEDGER_URL</code> at the top of this file's script, into <code>EVENT_WEBHOOK</code> in <code>js/shared.js</code>, and into <code>BOOKING_WEBHOOK</code> in <code>index.html</code>.</li>
+      <li>Push. Data starts arriving immediately and appears here.</li>
+    </ol>
+    <p class="muted">Nothing is recorded retrospectively — every day it's off is data you can't get back.</p>
+  </div>
+</main>
+
+<script src="js/shared.js"></script>
+<script>
+/* Paste the SAME Apps Script /exec URL used for EVENT_WEBHOOK. */
+const LEDGER_URL = '';
+const PIN = '8177';
+
+const gate = document.getElementById('gate');
+const pins = [...document.querySelectorAll('#pinRow input')];
+if (sessionStorage.getItem('aesir_dash') === '1') { gate.remove(); boot(); } else pins[0].focus();
+pins.forEach((p, i) => {
+  p.addEventListener('input', () => {
+    if (p.value && i < 3) pins[i + 1].focus();
+    const code = pins.map(x => x.value).join('');
+    if (code.length === 4){
+      if (code === PIN){ sessionStorage.setItem('aesir_dash', '1'); gate.remove(); boot(); }
+      else { document.getElementById('pinErr').textContent = 'WRONG PIN'; pins.forEach(x => x.value = ''); pins[0].focus(); }
+    }
+  });
+  p.addEventListener('keydown', e => { if (e.key === 'Backspace' && !p.value && i > 0) pins[i - 1].focus(); });
+});
+
+let DATA = {events: [], bookings: []}, DAYS = 30;
+
+async function boot(){
+  document.querySelectorAll('#range button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#range button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on'); DAYS = +b.dataset.days; render();
+  });
+  if (!LEDGER_URL){ document.getElementById('setup').style.display = 'block'; render(); return; }
+  try {
+    const r = await fetch(LEDGER_URL + '?summary=1', {cache: 'no-store'});
+    DATA = await r.json();
+  } catch(e){ document.getElementById('setup').style.display = 'block'; }
+  render();
+}
+
+const within = ts => (Date.now() - new Date(ts).getTime()) / 86400000 <= DAYS;
+const fmt = ts => new Date(ts).toLocaleDateString('en-GB', {day:'numeric', month:'short'}) + ' ' +
+                  new Date(ts).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+
+function render(){
+  const ev = (DATA.events || []).filter(e => within(e.ts));
+  const bk = (DATA.bookings || []).filter(b => within(b.ts));
+  const n = name => ev.filter(e => e.name === name).length;
+  const visitors = new Set(ev.map(e => e.ref).filter(Boolean)).size;
+  const wa = n('whatsapp_click'), call = n('call_click');
+
+  const steps = [
+    ['Visitors', visitors, ''],
+    ['Started booking', n('booking_started'), visitors ? pct(n('booking_started'), visitors) : ''],
+    ['Booked online', bk.length, visitors ? pct(bk.length, visitors) : ''],
+    ['WhatsApp taps', wa, visitors ? pct(wa, visitors) : ''],
+    ['Call taps', call, visitors ? pct(call, visitors) : ''],
+  ];
+  const max = Math.max(1, ...steps.map(s => s[1]));
+  document.getElementById('funnel').innerHTML = steps.map(([label, v, p]) =>
+    `<div class="fcell"><b>${v}</b><span>${label}</span>${p ? `<i>${p}</i>` : ''}
+     <div class="bar" style="width:${Math.round(v / max * 100)}%"></div></div>`).join('');
+
+  const enquiries = bk.length + wa + call;
+  document.getElementById('rate').textContent = visitors
+    ? `${enquiries} enquiries from ${visitors} visitors — ${pct(enquiries, visitors)} of people who landed made contact. Every WhatsApp message carries its visitor ref, so anything Neil receives tagged [web …] traces back to a row below.`
+    : 'No data in this range yet.';
+
+  document.querySelector('#bookings tbody').innerHTML = bk.length ? bk.slice().reverse().map(b =>
+    `<tr><td>${fmt(b.ts)}</td><td class="ref">${esc(b.ref)}</td><td class="ref">${esc(b.visitor || '—')}</td>
+     <td><b>${esc(b.svc)}</b></td><td>${esc(b.day)} ${esc(b.time)}</td>
+     <td>${esc(b.name)}<br><span class="muted">${esc(b.phone)}</span></td>
+     <td>${esc([b.model, b.reg].filter(Boolean).join(' · ') || '—')}</td></tr>`).join('')
+    : '<tr><td colspan="7" style="color:var(--dim)">No online bookings in this range.</td></tr>';
+
+  document.querySelector('#events tbody').innerHTML = ev.length ? ev.slice(-60).reverse().map(e =>
+    `<tr><td>${fmt(e.ts)}</td>
+     <td>${e.name === 'whatsapp_click' ? '<span class="tagged">WHATSAPP</span>' : esc(e.name.replace(/_/g,' '))}</td>
+     <td class="ref">${esc(e.ref || '—')}</td><td>${esc(e.source || '—')}</td><td>${esc(e.page || '—')}</td></tr>`).join('')
+    : '<tr><td colspan="5" style="color:var(--dim)">No events in this range.</td></tr>';
+}
+const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+</script>
+</body>
+</html>

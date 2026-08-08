@@ -53,3 +53,6 @@ Allow: /
 Sitemap: https://thomasrgriffiths08-blip.github.io/aesir-automotive/sitemap.xml
 # When the real domain lands, swap the Sitemap line for:
 # Sitemap: https://aesirautomotive.co.uk/sitemap.xml
+
+# Tom-only pages
+Disallow: /dashboard.html

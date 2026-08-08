@@ -334,3 +334,12 @@ section>.wrap{position:relative;z-index:1}
 
 /* ghost display type is a desktop flourish — it clips on small screens */
 @media(max-width:760px){.ghostword{display:none}}
+
+/* WhatsApp action — used in the hero and the mobile bar */
+.btn.wa-cta{background:#25D366;color:#04310f}
+.btn.wa-cta:hover{background:#2ff07a;color:#04310f}
+.mobar .btn{font-size:12px;padding:13px 6px}
+
+/* The mobile bar now carries Call / WhatsApp / Book, so the floating button
+   would be a fourth duplicate contact on the same screen. */
+@media(max-width:960px){.wa-fab{display:none}}

@@ -150,7 +150,14 @@ video::-webkit-media-controls{display:none!important}
 .hero-sub{font-size:17.5px;color:#cdd3dd;max-width:530px;margin-top:22px;text-shadow:0 2px 20px rgba(0,0,0,.6)}
 .hero-sub b{color:#fff}
 .hero-ctas{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;align-items:center}
-.coords{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;color:var(--mut);text-transform:uppercase;margin-top:34px}
+.btn.wa-cta{background:#25D366;color:#04310f}
+.btn.wa-cta:hover{background:#2ff07a;color:#04310f}
+/* quick start — skips the scroll and lands them in the widget part-filled */
+.quick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px}
+.quick .q-lab{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+.quick a{font-size:13.5px;font-weight:700;color:#dfe4ec;border-bottom:1.5px solid rgba(255,255,255,.22);padding-bottom:2px;transition:.18s}
+.quick a:hover{color:var(--acc);border-color:var(--acc)}
+.coords{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;color:var(--mut);text-transform:uppercase;margin-top:26px}
 .coords b{color:var(--acc)}
 /* the spec plate — a chassis plate riveted to the foot of the hero.
    Lit from the upper left, like every other dimensional thing here. */
@@ -371,6 +378,12 @@ section.has-gw{overflow:hidden}
    signal. Now it flows downward from under the nav and grows to fit. */
 @media(max-width:860px){
   .hero{height:auto;min-height:100svh;justify-content:flex-start;padding-top:88px}
+  /* two primary actions side by side; Call lives in the sticky bar below */
+  .hero-ctas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hero-ctas .btn{padding:14px 10px;font-size:13px}
+  .hero-ctas .btn.ghost{display:none}
+  .quick{margin-top:18px;gap:8px}
+  .quick a{font-size:13px}
   .hero-inner{padding-bottom:30px}
   .hero h1{font-size:clamp(32px,8.6vw,50px)}
   .hero-sub{font-size:15.5px;margin-top:16px;max-width:34ch}
@@ -456,7 +469,16 @@ section.has-gw{overflow:hidden}
     <p class="hero-sub">Servicing, dealer-level diagnostics and <b>full engine rebuilds</b> — for everything the BMW group has ever built. <b>MINI to Rolls-Royce</b>, modern M cars to late-20th-century classics.</p>
     <div class="hero-ctas">
       <a class="btn" href="#book">Book your car in</a>
-      <a class="btn ghost" href="tel:07956658177">Call Neil · 07956 658177</a>
+      <a class="btn wa-cta" href="https://wa.me/447956658177" target="_blank" rel="noopener">WhatsApp Neil</a>
+      <a class="btn ghost" href="tel:07956658177">Call · 07956 658177</a>
+    </div>
+    <!-- one tap from landing to a part-filled booking -->
+    <div class="quick" aria-label="Quick start">
+      <span class="q-lab">In for</span>
+      <a href="#book" data-svc="Service &amp; Oil">a service</a>
+      <a href="#book" data-svc="Diagnostics">a fault</a>
+      <a href="#book" data-svc="Engine work">engine work</a>
+      <a href="#book" data-svc="MOT Prep">an MOT</a>
     </div>
     <div class="coords"><b>POND FARM</b> · NEWYEARS GREEN LANE · UXBRIDGE UB9</div>
   </div>
@@ -847,7 +869,8 @@ section.has-gw{overflow:hidden}
 
 <div class="mobar">
   <a class="btn ghost" href="tel:07956658177">✆ Call</a>
-  <a class="btn" href="#book">Book online</a>
+  <a class="btn wa-cta" href="https://wa.me/447956658177" target="_blank" rel="noopener">WhatsApp</a>
+  <a class="btn" href="#book">Book</a>
 </div>
 
 <script src="js/shared.js"></script>
@@ -1005,6 +1028,16 @@ const BOOKINGS_OPEN = true;
     });
   }
   buildDays(); renderTimes();
+  /* hero quick-start: one tap selects the service and scrolls to the widget,
+     so a visitor lands part-way through the booking instead of at step one */
+  document.querySelectorAll('.quick a[data-svc]').forEach(link => {
+    link.addEventListener('click', () => {
+      const c = [...svcC.children].find(x => x.textContent === link.dataset.svc);
+      if (c){ c.click(); track('quick_start', {svc: link.dataset.svc}); }
+      setTimeout(() => { const f = document.getElementById('fName'); if (f && matchMedia('(pointer:fine)').matches) f.focus({preventScroll:true}); }, 700);
+    });
+  });
+
   /* arriving from a service page pre-selects that service */
   const preSvc = new URLSearchParams(location.search).get('svc');
   if (preSvc){
