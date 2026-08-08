@@ -44,6 +44,14 @@ const store = {
      arriving on Neil's phone to the click that produced them. */
 const ANALYTICS_ID = '';
 const EVENT_WEBHOOK = '';
+/* Shared secret that must match WRITE_KEY in the Apps Script. Without it the
+   ledger endpoint is an open door: anyone could post fake bookings into the
+   sheet you invoice from and fire emails at Neil. It only permits writing —
+   reading needs the separate READ_KEY, which never appears in this file. */
+const WEBHOOK_KEY = '';
+/* Your own visits to the diary and the dashboard must never enter the ledger:
+   the numbers you bill from can't include your own clicks. */
+const IS_BACKOFFICE = /(admin|dashboard)\.html$/.test(location.pathname);
 
 /* one ref per visitor, stable across pages and days — the commission key */
 const VISITOR_REF = (() => {
@@ -64,15 +72,26 @@ if (ANALYTICS_ID){
 }
 
 function track(name, props){
+  if (IS_BACKOFFICE) return;
   const data = Object.assign({ref: VISITOR_REF, page: location.pathname.split('/').pop() || 'index'}, props || {});
   try { if (window.umami && umami.track) umami.track(name, data); } catch(e){}
-  if (EVENT_WEBHOOK){
-    try {
-      navigator.sendBeacon(EVENT_WEBHOOK,
-        JSON.stringify({kind: 'event', name, ts: Date.now(), ...data}));
-    } catch(e){}
-  }
+  if (!EVENT_WEBHOOK) return;
+  const body = JSON.stringify({kind: 'event', t: WEBHOOK_KEY, name, ts: Date.now(), ...data});
+  try {
+    /* sendBeacon sends text/plain, so it is a "simple" request and never
+       triggers a CORS preflight — which Apps Script cannot answer. Some
+       content blockers kill the Beacon API, hence the fetch fallback. */
+    if (!(navigator.sendBeacon && navigator.sendBeacon(EVENT_WEBHOOK, body))){
+      fetch(EVENT_WEBHOOK, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                            body, keepalive: true}).catch(() => {});
+    }
+  } catch(e){}
 }
+
+/* The funnel needs a denominator. Without a pageview event, "visitors" would
+   count only people who already made contact, and the conversion percentages
+   would read over 100%. */
+if (!IS_BACKOFFICE) track('pageview', {});
 
 /* ============ DYNAMIC WHATSAPP MESSAGES ============
    Every wa.me link on the site rebuilds its message at click time from what

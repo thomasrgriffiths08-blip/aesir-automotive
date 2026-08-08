@@ -1119,8 +1119,11 @@ const BOOKINGS_OPEN = true;
        and Apps Script reads it from e.postData.contents either way. */
     if (BOOKING_WEBHOOK) fetch(BOOKING_WEBHOOK, {
       method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'},
-      body: JSON.stringify({source: 'aesir-website', ...booking})
-    }).catch(() => {});
+      body: JSON.stringify({kind: 'booking', t: WEBHOOK_KEY, source: 'aesir-website', ...booking})
+    }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); })
+      /* Never silent: a booking missing from the ledger is a missing commission,
+         so at least say so in the console rather than swallowing it. */
+      .catch(err => console.error('[aesir] ledger webhook failed for ' + ref + ':', err.message));
     document.getElementById('doneRef').textContent = 'REF ' + ref;
     document.getElementById('doneLine').textContent = state.day + ' · ' + time + ' — ' + state.svc;
     typeInto(document.getElementById('doneSms'),

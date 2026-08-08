@@ -50,9 +50,11 @@ tr:hover td{background:var(--panel)}
 
 <div class="gate" id="gate">
   <a class="logo"><span class="mstripe"><i></i><i></i><i></i></span><span>ÆSIR<small>WEBSITE&nbsp;STATS</small></span></a>
-  <p>Enter PIN</p>
-  <div class="pin-row" id="pinRow">
-    <input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1">
+  <p>Enter ledger key</p>
+  <div class="pin-row">
+    <input id="ledgerKey" type="password" autocomplete="off" spellcheck="false"
+           style="width:min(340px,80vw);height:52px;font-size:16px;letter-spacing:.1em;padding:0 14px">
+    <button class="btn" id="keyGo" style="padding:0 22px">Open</button>
   </div>
   <div class="err" id="pinErr"></div>
 </div>
@@ -107,22 +109,24 @@ tr:hover td{background:var(--panel)}
 <script>
 /* Paste the SAME Apps Script /exec URL used for EVENT_WEBHOOK. */
 const LEDGER_URL = '';
-const PIN = '8177';
 
+/* The key is TYPED, never stored in this file. A PIN checked in client-side
+   JavaScript protects nothing — anyone could read it in the source and then
+   call the ledger directly. The real gate is server-side: the Apps Script
+   refuses to return a single row without the correct READ_KEY, so this field
+   is the actual lock rather than a picture of one. */
 const gate = document.getElementById('gate');
-const pins = [...document.querySelectorAll('#pinRow input')];
-if (sessionStorage.getItem('aesir_dash') === '1') { gate.remove(); boot(); } else pins[0].focus();
-pins.forEach((p, i) => {
-  p.addEventListener('input', () => {
-    if (p.value && i < 3) pins[i + 1].focus();
-    const code = pins.map(x => x.value).join('');
-    if (code.length === 4){
-      if (code === PIN){ sessionStorage.setItem('aesir_dash', '1'); gate.remove(); boot(); }
-      else { document.getElementById('pinErr').textContent = 'WRONG PIN'; pins.forEach(x => x.value = ''); pins[0].focus(); }
-    }
-  });
-  p.addEventListener('keydown', e => { if (e.key === 'Backspace' && !p.value && i > 0) pins[i - 1].focus(); });
-});
+const keyInput = document.getElementById('ledgerKey');
+let READ_KEY = sessionStorage.getItem('aesir_key') || '';
+if (READ_KEY){ gate.remove(); boot(); } else keyInput.focus();
+document.getElementById('keyGo').onclick = submitKey;
+keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitKey(); });
+function submitKey(){
+  READ_KEY = keyInput.value.trim();
+  if (!READ_KEY) return;
+  sessionStorage.setItem('aesir_key', READ_KEY);
+  gate.remove(); boot();
+}
 
 let DATA = {events: [], bookings: []}, DAYS = 30;
 
@@ -146,18 +150,23 @@ async function boot(){
    blank. JSONP has no such constraint, so it's the fallback rather than the
    thing you debug at 11pm. */
 function load(){
-  return fetch(LEDGER_URL + '?summary=1', {cache: 'no-store'})
-    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .catch(() => new Promise((resolve, reject) => {
-      const cb = 'aesirLedger' + Date.now().toString(36);
-      const t = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 12000);
-      function cleanup(){ clearTimeout(t); delete window[cb]; s.remove(); }
-      window[cb] = d => { cleanup(); resolve(d); };
-      const s = document.createElement('script');
-      s.src = LEDGER_URL + '?summary=1&callback=' + cb;
-      s.onerror = () => { cleanup(); reject(new Error('jsonp failed')); };
-      document.head.appendChild(s);
-    }));
+  const q = '?summary=1&key=' + encodeURIComponent(READ_KEY);
+  return fetch(LEDGER_URL + q, {cache: 'no-store'})
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d => { if (d && d.error) throw new Error(d.error); return d; })
+    .catch(err => {
+      if (/bad key/i.test(err.message)) throw err;   /* wrong key — don't retry */
+      return new Promise((resolve, reject) => {
+        const cb = 'aesirLedger' + Date.now().toString(36);
+        const t = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 12000);
+        function cleanup(){ clearTimeout(t); delete window[cb]; s.remove(); }
+        window[cb] = d => { cleanup(); d && d.error ? reject(new Error(d.error)) : resolve(d); };
+        const s = document.createElement('script');
+        s.src = LEDGER_URL + q + '&callback=' + cb;
+        s.onerror = () => { cleanup(); reject(new Error('could not reach the ledger')); };
+        document.head.appendChild(s);
+      });
+    });
 }
 
 const within = ts => (Date.now() - new Date(ts).getTime()) / 86400000 <= DAYS;
@@ -168,7 +177,11 @@ function render(){
   const ev = (DATA.events || []).filter(e => within(e.ts));
   const bk = (DATA.bookings || []).filter(b => within(b.ts));
   const n = name => ev.filter(e => e.name === name).length;
-  const visitors = new Set(ev.map(e => e.ref).filter(Boolean)).size;
+  /* Visitors = distinct refs that produced a pageview. Counting refs across ALL
+     events would only count people who already made contact, and every
+     conversion rate below would read over 100%. */
+  const visitors = new Set(ev.filter(e => e.name === 'pageview').map(e => e.ref).filter(Boolean)).size
+                   || new Set(ev.map(e => e.ref).filter(Boolean)).size;
   const wa = n('whatsapp_click'), call = n('call_click');
 
   const steps = [
@@ -195,11 +208,14 @@ function render(){
      <td>${esc([b.model, b.reg].filter(Boolean).join(' · ') || '—')}</td></tr>`).join('')
     : '<tr><td colspan="7" style="color:var(--dim)">No online bookings in this range.</td></tr>';
 
-  document.querySelector('#events tbody').innerHTML = ev.length ? ev.slice(-60).reverse().map(e =>
+  /* pageviews are the denominator, not a contact — showing them here would
+     bury the rows that actually matter */
+  const contacts = ev.filter(e => e.name !== 'pageview');
+  document.querySelector('#events tbody').innerHTML = contacts.length ? contacts.slice(-60).reverse().map(e =>
     `<tr><td>${fmt(e.ts)}</td>
      <td>${e.name === 'whatsapp_click' ? '<span class="tagged">WHATSAPP</span>' : esc(e.name.replace(/_/g,' '))}</td>
      <td class="ref">${esc(e.ref || '—')}</td><td>${esc(e.source || '—')}</td><td>${esc(e.page || '—')}</td></tr>`).join('')
-    : '<tr><td colspan="5" style="color:var(--dim)">No events in this range.</td></tr>';
+    : '<tr><td colspan="5" style="color:var(--dim)">No contact clicks in this range.</td></tr>';
 }
 const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '';
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

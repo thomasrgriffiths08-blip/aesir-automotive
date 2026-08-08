@@ -55,55 +55,105 @@ the moment a booking lands.**
 2. Extensions → Apps Script, delete the boilerplate, paste:
 
 ```javascript
-const SHEET_ID = 'PASTE-YOUR-SHEET-ID';          // from the sheet's URL
-const NOTIFY = ['you@example.com'];               // add Neil's email when he's ready
+/* ÆSIR ledger — paste this whole file into Apps Script.
+   Replace the FOUR constants below. Nothing else needs changing. */
 
-function doPost(e) {
-  const d = JSON.parse(e.postData.contents);
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  if (d.kind === 'event') {
-    ss.getSheetByName('Events').appendRow([
-      new Date(), d.name, d.ref || '', d.page || '', d.source || '', d.svc || ''
-    ]);
-  } else {   // a booking from the widget webhook
-    ss.getSheetByName('Bookings').appendRow([
-      new Date(), d.ref || '', d.visitor || '', d.svc || '', d.day || '',
-      d.time || '', d.name || '', d.phone || '', d.reg || '', d.model || '', d.source || ''
-    ]);
-    MailApp.sendEmail(NOTIFY.join(','),
-      'BOOKING ' + d.ref + ' — ' + d.day + ' ' + d.time + ' — ' + d.svc,
-      d.name + ' · ' + d.phone + (d.model ? ' · ' + d.model : '') +
-      (d.reg ? ' · ' + d.reg : '') + '\nVisitor ref: ' + (d.visitor || '—') +
-      '\n\nIt is already in the live diary. This email is the notification.');
-  }
-  return ContentService.createTextOutput('ok');
+const SHEET_ID  = 'PASTE-YOUR-SHEET-ID';       // the long code in the Sheet URL
+const NOTIFY    = ['you@example.com'];          // your email. Add Neil's LATER
+const WRITE_KEY = 'change-me-write';            // must equal WEBHOOK_KEY in js/shared.js
+const READ_KEY  = 'change-me-read';             // typed into dashboard.html. DIFFERENT, 16+ chars
+
+const HEADERS = {
+  Events:   ['When','Event','Visitor ref','Page','Source','Service','Booking ref'],
+  Bookings: ['When','Booking ref','Visitor ref','Service','Day','Date','Time',
+             'Name','Phone','Reg','Model','Source']
+};
+
+/* Creates the tab if it's missing, so a typo or a deleted tab can't take the
+   ledger down silently. */
+function tab(ss, name) {
+  let sh = ss.getSheetByName(name);
+  if (!sh) { sh = ss.insertSheet(name); sh.appendRow(HEADERS[name]); }
+  return sh;
 }
 
-// Feeds dashboard.html. Same URL, with ?summary=1
-// Supports ?callback=fn so the dashboard can fall back to JSONP if a plain
-// cross-origin fetch is ever blocked.
+function doPost(e) {
+  try {
+    if (!e || !e.postData) return ContentService.createTextOutput('no body');
+    const d = JSON.parse(e.postData.contents);
+    if (d.t !== WRITE_KEY) return ContentService.createTextOutput('bad key');
+
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    // ISO strings, not Date objects: a reformatted column can't then make rows
+    // vanish from the dashboard.
+    const when = new Date().toISOString();
+
+    if (d.kind === 'event') {
+      tab(ss, 'Events').appendRow([when, d.name || '', d.ref || '', d.page || '',
+                                   d.source || '', d.svc || '', d.booking_ref || '']);
+    } else if (d.kind === 'booking') {
+      tab(ss, 'Bookings').appendRow([when, d.ref || '', d.visitor || '', d.svc || '',
+        d.day || '', d.iso || '', d.time || '', d.name || '', d.phone || '',
+        d.reg || '', d.model || '', d.source || '']);
+      try {
+        MailApp.sendEmail(NOTIFY.join(','),
+          'BOOKING ' + d.ref + ' — ' + d.day + ' ' + d.time + ' — ' + d.svc,
+          d.name + ' · ' + d.phone + (d.model ? ' · ' + d.model : '') +
+          (d.reg ? ' · ' + d.reg : '') + '\nVisitor ref: ' + (d.visitor || '—') +
+          '\n\nIt is already in the live diary. This email is the notification.');
+      } catch (mailErr) {
+        // The row matters more than the email — never lose the commission record
+        console.error('mail failed: ' + mailErr);
+      }
+    } else {
+      return ContentService.createTextOutput('ignored');   // unknown kind
+    }
+    return ContentService.createTextOutput('ok');
+  } catch (err) {
+    console.error(err);
+    return ContentService.createTextOutput('error');
+  }
+}
+
+/* Feeds dashboard.html. Requires READ_KEY — without this the whole ledger,
+   including every customer's name and mobile number, would be readable by
+   anyone who found the URL. Supports ?callback= for the JSONP fallback. */
 function doGet(e) {
+  const p = (e && e.parameter) || {};
+  const out = body => {
+    if (p.callback) return ContentService.createTextOutput(p.callback + '(' + body + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
+  };
+  if (p.key !== READ_KEY) return out(JSON.stringify({error: 'bad key'}));
+
   const ss = SpreadsheetApp.openById(SHEET_ID);
+  const MAX = 3000;
   const rows = name => {
     const sh = ss.getSheetByName(name);
-    return sh ? sh.getDataRange().getValues() : [];   // missing tab != crash
+    if (!sh || sh.getLastRow() < 2) return [];
+    const first = Math.max(2, sh.getLastRow() - MAX + 1);
+    return sh.getRange(first, 1, sh.getLastRow() - first + 1, sh.getLastColumn()).getValues();
   };
+  const str = v => (v instanceof Date) ? v.toISOString() : String(v || '');
   const ev = rows('Events').map(r => ({
-    ts: r[0], name: r[1], ref: r[2], page: r[3], source: r[4], svc: r[5]
-  })).filter(x => x.ts instanceof Date);
+    ts: str(r[0]), name: r[1], ref: r[2], page: r[3], source: r[4], svc: r[5], booking_ref: r[6]
+  })).filter(x => x.ts);
   const bk = rows('Bookings').map(r => ({
-    ts: r[0], ref: r[1], visitor: r[2], svc: r[3], day: r[4], time: r[5],
-    name: r[6], phone: r[7], reg: r[8], model: r[9]
-  })).filter(x => x.ts instanceof Date);
+    ts: str(r[0]), ref: r[1], visitor: r[2], svc: r[3], day: r[4], iso: r[5],
+    time: r[6], name: r[7], phone: r[8], reg: r[9], model: r[10]
+  })).filter(x => x.ts);
+  return out(JSON.stringify({events: ev, bookings: bk}));
+}
 
-  const payload = JSON.stringify({events: ev, bookings: bk});
-  const cb = e && e.parameter && e.parameter.callback;
-  if (cb) {
-    return ContentService.createTextOutput(cb + '(' + payload + ')')
-      .setMimeType(ContentService.MimeType.JAVASCRIPT);
-  }
-  return ContentService.createTextOutput(payload)
-    .setMimeType(ContentService.MimeType.JSON);
+/* Run this ONCE from the editor to create the tabs and trigger the Google
+   permission prompts before any real traffic arrives. */
+function smokeTest() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  tab(ss, 'Events'); tab(ss, 'Bookings');
+  MailApp.sendEmail(NOTIFY.join(','), 'Aesir ledger — smoke test',
+    'If you are reading this, the Sheet ID and email both work.');
+  Logger.log('OK — sheet reachable, tabs ready, test email sent');
 }
 ```
 
